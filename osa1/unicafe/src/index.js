@@ -4,6 +4,12 @@ import ReactDOM from 'react-dom'
 const Statistics = ({good,neutral,bad})=>{
 	let all= good+neutral+bad;
 	let average = (bad*(-1))+good;
+if(all===0){
+return(<div>
+<h1>Statistics</h1>
+<p>No feedback Given</p>
+</div>)
+}
 return(
 	<div>
 		<h1>Statistics</h1>
