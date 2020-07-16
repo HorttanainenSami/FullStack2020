@@ -1,24 +1,29 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 
+const StatisticsLine=({text,value})=>(
+	<div>
+		<p>{text} { value}</p>
+	</div>
+)
 const Statistics = ({good,neutral,bad})=>{
 	let all= good+neutral+bad;
-	let average = (bad*(-1))+good;
+	let average = ((bad*(-1))+good)/all;
+	let positive =(good/all)*100+'%';
 if(all===0){
-return(<div>
-<h1>Statistics</h1>
-<p>No feedback Given</p>
-</div>)
-}
+	return(
+		<div>
+			<p>No feedback Given</p>
+		</div>)
+	}
 return(
 	<div>
-		<h1>Statistics</h1>
-		<p> Good {good}</p>
-		<p> Neutral {neutral} </p>
-		<p> Bad {bad} </p>
-		<p> All {all} </p>
-		<p> Average {all===0?0:average/all} </p>
-		<p> Positive {all===0?0:(good/all)*100}% </p>
+		<StatisticsLine text='Good' value={good} />
+		<StatisticsLine text='Neutral' value={neutral} />
+		<StatisticsLine text='Bad' value={bad} />
+		<StatisticsLine text='All' value={all} />
+		<StatisticsLine text='Average' value={average} />
+		<StatisticsLine text='Positive' value={positive} />
 	</div>
 )
 
@@ -45,6 +50,7 @@ const increaseBad=()=>{
 	<button onClick={increaseGood}>good</button>
 	<button onClick={increaseNeutral}>neutral</button>
 	<button onClick={increaseBad}>bad</button>
+	<h1> Statistics</h1>
 	<Statistics good={good} neutral={neutral} bad={bad}/>
     </div>
   )
