@@ -1,6 +1,20 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 
+const Best =(props)=>{
+	let most=0;
+	for(let i=0; i<props.anecdotes.length; i++){
+		if(props.points[i]>props.points[most]){
+			most=i;
+		}
+	}
+
+	return(
+		<div>
+			{props.anecdotes[most]}
+		</div>
+	)
+}
 const App = (props) => {
 	const [selected, setSelected] = useState(0)
 	const [points,setPoints]=useState(Array.apply(null, new Array(anecdotes.length)).map(Number.prototype.valueOf,0))
@@ -22,6 +36,8 @@ const App = (props) => {
 			<p> has {points[selected]} votes</p>
 			<p> <button onClick={increaseVote}> vote</button>
 			<button onClick={handleClick}>next anecdot</button></p>
+
+			<Best anecdotes={anecdotes} points={points} />
 	    </div>
 	  )
 	}
