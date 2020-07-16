@@ -2,9 +2,10 @@ import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 
 const StatisticsLine=({text,value})=>(
-	<div>
-		<p>{text} { value}</p>
-	</div>
+	<tr>
+		<td>{text}</td>
+		<td>{value}</td>
+	</tr>
 )
 const Statistics = ({good,neutral,bad})=>{
 	let all= good+neutral+bad;
@@ -18,12 +19,16 @@ if(all===0){
 	}
 return(
 	<div>
+		<table>
+		<tbody>
 		<StatisticsLine text='Good' value={good} />
 		<StatisticsLine text='Neutral' value={neutral} />
 		<StatisticsLine text='Bad' value={bad} />
 		<StatisticsLine text='All' value={all} />
 		<StatisticsLine text='Average' value={average} />
 		<StatisticsLine text='Positive' value={positive} />
+		</tbody>
+		</table>
 	</div>
 )
 
