@@ -26,10 +26,10 @@ const Content =({course})=>{
 	)
 }
 const Total = ({course})=>{
-	let total=0;
-	for(let part of course.parts){
-		total+=part.exercises;
-	}
+	let total=course.parts.reduce(
+	(acc, curValue)=>
+	 acc+curValue.exercises ,0);
+
 	return(
 		<div> 
 			<p><b>Total of {total} exercises </b></p>
