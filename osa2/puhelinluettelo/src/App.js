@@ -1,18 +1,40 @@
 import React, { useState } from 'react'
-
-const App = () => {
-  const [ persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
-  ]) 
-  const [ newName, setNewName ] = useState('')
+const Filter=({setFilter})=>{
 	const handleChange=(event)=>{
-		setNewName(event.target.value);
+		setFilter(event.target.value);
+		console.log(event.target.value)
 	}
+	return(
+	<div> 
+	<p> filter shown with <input onChange={handleChange}/></p>
+	</div>
+	)
+
+}
+const Person=({persons,filter})=>{
+const filtPersons=persons.filter(person=>person.name.toLowerCase().includes(filter));
+
+	return(<div>
+	  {filtPersons.map(person=><li key={person.name}>{person.name} {person.number}</li>)}
+		</div>
+	)
+}
+const App = () => {
+	const [ persons, setPersons] = useState([
+	    { name: 'Arto Hellas',number:'040-1231244' }
+	  ]) 
+	const [ newName, setNewName ] = useState('')
+	const [newNumb,setNewNumb]=useState('')
+	const [filter, setFilter]=useState('');
+	const handleChange=(event)=>setNewName(event.target.value);
+	const handleNumb=(event)=>setNewNumb(event.target.value);
+	
 	const addName=(event)=>{
 		event.preventDefault();
 		if(persons.filter(person=>person.name===newName).length===0){
 		const personObject={
-			name:newName
+			name:newName,
+			number:newNumb
 		}
 		setPersons(persons.concat(personObject));
 		}
@@ -23,18 +45,24 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+	
+	<Filter setFilter={setFilter}/>
 
+	  <h2> Add a new </h2>
       <form>
         <div>
           name: <input onChange={handleChange} />
         </div>
+	  <div>
+	  number: <input onChange={handleNumb} />
+	  </div>
         <div>
           <button onClick={addName}>add</button>
         </div>
       </form>
 
       <h2>Numbers</h2>
-	  {persons.map(person=><li key={person.name}>{person.name}</li>)}
+	  <Person persons={persons} filter={filter} />
     </div>
   )
 
