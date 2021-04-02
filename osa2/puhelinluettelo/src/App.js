@@ -14,10 +14,15 @@ const App = () => {
   }
   const addPerson = (event) => {
     event.preventDefault()
-    const newPerson={
-      name:newName,
+
+    if(!persons.find(element =>element.name===newName )){
+      const newPerson={
+        name:newName,
+      }
+      setPersons(persons.concat(newPerson))
+    }else{
+    alert(`${newName}, is already added to phonebook`)
     }
-    setPersons(persons.concat(newPerson))
   }
   return (
     <div>
