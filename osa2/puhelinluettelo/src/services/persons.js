@@ -4,7 +4,12 @@ const url='http://localhost:3001/persons'
 
 const getAll = () => {  
   const response = axios.get(url)
-  return response.then(response=>response.data)
+  const nonExist = {
+    name:'Not on server',
+    number:'12345',
+    id:10000,
+  }
+  return response.then(response=>response.data.concat(nonExist))
 }
 const create = (personObject) =>{
   const response = axios
