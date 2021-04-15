@@ -20,6 +20,16 @@ const App = () => {
   const handleNameChange = (event) => setNewName(event.target.value)
   const handleNumberChange = (event) => setNewNumber(event.target.value)
 
+  const handleDelete = id => {
+    const deletePerson={
+     ...persons.find(person=>person.id===id)
+    }
+    if( window.confirm(`Delete ${deletePerson.name}`)){
+      PersonService
+      .remove(id)
+      .then(response=> setPersons(persons.filter(person=>person.id!==id)))
+    }
+  }
   const addPerson = (event) => {
     event.preventDefault()
 
@@ -51,7 +61,7 @@ const App = () => {
     <h3> Add a new</h3>
       <AddPerson onSubmit={addPerson} handleNameChange={handleNameChange} newName={newName} handleNumberChange={handleNumberChange} newNumber={newNumber} />
     <h3>Numbers</h3>
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} handleDelete={handleDelete} />
     </div>
   )
 
