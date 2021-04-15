@@ -11,6 +11,11 @@ const create = (personObject) =>{
   .post(url, personObject)
   return response.then(response=> response.data )
 }
+const update = (personObject, id) =>{
+  const response = axios
+  .put(`${url}/${id}`, personObject)
+  return response.then(response=>response.data)
+}
 const remove = (id) => {
 
   const response = axios
@@ -18,6 +23,6 @@ const remove = (id) => {
   return response.then(response=>response)
 
 }
-const personService = { getAll, create, remove}
+const personService = { getAll, create, remove, update}
 export default personService
 
