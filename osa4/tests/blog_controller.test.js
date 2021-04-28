@@ -48,7 +48,8 @@ describe('HTTP POST', () => {
     const newBlog = {
       title:'testi',
       author:'bloggaaja',
-      url:'http'
+      url:'http',
+      likes: 1
     }
     await api
       .post('/api/blogs')
@@ -62,7 +63,54 @@ describe('HTTP POST', () => {
     const content = response.body.map(r => r.author)
     expect(content).toContain('bloggaaja')
   })
+  test('a valid blog without likes is added with zero likes', async () => {
+    await Blog.deleteMany({})
 
+    const newBlog = {
+      title:'testi',
+      author:'bloggaaja',
+      url:'http'
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    
+    const content = response.body
+    expect(content[0].likes).toBe(0)
+  })
+  test('a blog without url is not added to db', async () => {
+    const invalidBlog = {
+      title: 'testi',
+      author: 'testi'
+    }
+    await api
+      .post('/api/blogs')
+      .send(invalidBlog)
+      .expect(400)
+
+    const response = await api.get('/api/blogs')
+    expect(response.body).toHaveLength(helper.blogs.length)
+  })
+  test('a blog without title is not added to db', async () => {
+    const invalidBlog = {
+      author: 'testi',
+      url: 'url'
+
+    }
+    await api
+      .post('/api/blogs')
+      .send(invalidBlog)
+      .expect(400)
+
+    const response = await api.get('/api/blogs')
+    expect(response.body).toHaveLength(helper.blogs.length)
+
+  })
 })
 afterAll(() => {
   mongoose.connection.close()
