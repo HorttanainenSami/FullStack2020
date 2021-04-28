@@ -11,35 +11,58 @@ beforeEach(async () => {
   await Blog.insertMany(helper.blogs)
 })
 
+describe('HTTP GET', () => {
+  test('Blogs are returned as json', async () => {
+    await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
+  test('there are correct sum of blogs', async () => {
+    const blogs = await api.get('/api/blogs')
 
-test('Blogs are returned as json', async () => {
-  await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
+    expect(blogs.body).toHaveLength(helper.blogs.length)
+  })
+
+  test('first title is React patterns', async () => {
+    const response = await api.get('/api/blogs')
+
+    const content = response.body.map(r => r.title)
+    expect(content[0]).toContain('React patterns')
+  })
+
+  test('returned document has key:id', async () => {
+    const response = await api.get('/api/blogs')
+    const firstItem = response.body[0]
+    expect(firstItem.id).toBeDefined()
+  })
+  test('returned document doesnt have key __id', async () => {
+    const response = await api.get('/api/blogs')
+    const firstBlog = response.body[0]
+    expect(firstBlog.__id).not.toBeDefined()
+  })
 })
-test('there are correct sum of blogs', async () => {
-  const blogs = await api.get('/api/blogs')
+describe('HTTP POST', () => {
+  test('a valid blog can be added', async () => {
+    
+    const newBlog = {
+      title:'testi',
+      author:'bloggaaja',
+      url:'http'
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
-  expect(blogs.body).toHaveLength(helper.blogs.length)
-})
+    const response = await api.get('/api/blogs')
+    expect(response.body).toHaveLength(helper.blogs.length + 1)
 
-test('first title is React patterns', async () => {
-  const response = await api.get('/api/blogs')
+    const content = response.body.map(r => r.author)
+    expect(content).toContain('bloggaaja')
+  })
 
-  const content = response.body.map(r => r.title)
-  expect(content[0]).toContain('React patterns')
-})
-
-test('returned document has key:id', async () => {
-  const response = await api.get('/api/blogs')
-  const firstItem = response.body[0]
-  expect(firstItem.id).toBeDefined()
-})
-test('returned document doesnt have key __id', async () => {
-  const response = await api.get('/api/blogs')
-  const firstBlog = response.body[0]
-  expect(firstBlog.__id).not.toBeDefined()
 })
 afterAll(() => {
   mongoose.connection.close()
