@@ -1,9 +1,10 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
-const app = require('../App')
-const api = supertest(app)
 const Blog = require('../models/blog')
-const helper = require('../tests/test_helper.js')
+const helper = require('./test_helper.js')
+const app = require('../App')
+
+const api = supertest(app)
 
 
 beforeEach(async () => {
@@ -44,12 +45,11 @@ describe('HTTP GET', () => {
 })
 describe('HTTP POST', () => {
   test('a valid blog can be added', async () => {
-    
     const newBlog = {
-      title:'testi',
-      author:'bloggaaja',
-      url:'http',
-      likes: 1
+      title: 'testi',
+      author: 'bloggaaja',
+      url: 'http',
+      likes: 1,
     }
     await api
       .post('/api/blogs')
@@ -67,9 +67,9 @@ describe('HTTP POST', () => {
     await Blog.deleteMany({})
 
     const newBlog = {
-      title:'testi',
-      author:'bloggaaja',
-      url:'http'
+      title: 'testi',
+      author: 'bloggaaja',
+      url: 'http',
     }
 
     await api
@@ -79,14 +79,14 @@ describe('HTTP POST', () => {
       .expect('Content-Type', /application\/json/)
 
     const response = await api.get('/api/blogs')
-    
+
     const content = response.body
     expect(content[0].likes).toBe(0)
   })
   test('a blog without url is not added to db', async () => {
     const invalidBlog = {
       title: 'testi',
-      author: 'testi'
+      author: 'testi',
     }
     await api
       .post('/api/blogs')
@@ -109,9 +109,45 @@ describe('HTTP POST', () => {
 
     const response = await api.get('/api/blogs')
     expect(response.body).toHaveLength(helper.blogs.length)
-
   })
 })
+describe('DELETE', () => {
+  test('deleting successfully when id is valid', async () => {
+    const initialBlogs = await api.get('/api/blogs')
+    const firstBlogId = initialBlogs.body[0].id
+
+    await api
+      .delete(`/api/blogs/${firstBlogId}`)
+      .expect(204)
+    const blogs = await api.get('/api/blogs')
+    expect(blogs.body).toHaveLength(initialBlogs.body.length - 1)
+  })
+  test('deleting fails when id is malformatted', async () => {
+    const initialBlogs = await api.get('/api/blogs')
+
+    await api
+      .delete('/api/blogs/1234')
+      .expect(400)
+
+    const blogs = await api.get('/api/blogs')
+    expect(blogs.body).toHaveLength(initialBlogs.body.length)
+  })
+  test('deleting with not existant id doesnt remove from list', async () => {
+    const initialBlogs = await api.get('/api/blogs')
+    const firstBlogId = initialBlogs.body[0].id
+
+    await api
+      .delete(`/api/blogs/${firstBlogId}`)
+      .expect(204)
+
+    await api
+      .delete(`/api/blogs/${firstBlogId}`)
+      .expect(204)
+    const blogs = await api.get('/api/blogs')
+    expect(blogs.body).toHaveLength(initialBlogs.body.length - 1)
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })

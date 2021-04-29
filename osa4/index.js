@@ -1,8 +1,8 @@
-const app = require('./App')
 const http = require('http')
+const app = require('./App')
 const config = require('./utils/config')
 const logger = require('./utils/logger')
- 
+
 const server = http.createServer(app)
 
 const PORT = config.PORT || 3003
