@@ -4,7 +4,7 @@ const User = require('../models/user')
 require('express-async-errors')
 
 userRouter.get('/', async (request, response) => {
-  response.json(await User.find({}))
+  response.json(await User.find({}).populate('blogs', { url: 1, title: 1, author: 1, id: 1 }))
 })
 
 class ValidationError extends Error {

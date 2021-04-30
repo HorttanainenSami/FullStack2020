@@ -1,12 +1,33 @@
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 const supertest = require('supertest')
+const jwt = require('jsonwebtoken')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const helper = require('./test_helper.js')
 const app = require('../App')
+const config = require('../utils/config')
 
 const api = supertest(app)
-
-
+let token
+let invalidToken
+beforeAll(async () => {
+  await User.deleteMany({})
+  const passwordHash = await bcrypt.hash('asd', 10)
+  const user = new User({
+    username: 'sami',
+    name: 'sami',
+    passwordHash,
+  })
+  await user.save()
+  const initialUser = await User.findOne({ username: user.username })
+  const userToken = {
+    username: initialUser.username,
+    id: initialUser._id,
+  }
+  token = 'Bearer '.concat(jwt.sign(userToken, config.SECRET))
+  invalidToken = 'Bearer '.concat(jwt.sign('asd', config.SECRET))
+})
 beforeEach(async () => {
   await Blog.deleteMany({})
   await Blog.insertMany(helper.blogs)
@@ -53,6 +74,7 @@ describe('HTTP POST', () => {
     }
     await api
       .post('/api/blogs')
+      .set({ 'Authorization': token })
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -74,6 +96,7 @@ describe('HTTP POST', () => {
 
     await api
       .post('/api/blogs')
+      .set({ 'Authorization': token })
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -90,6 +113,7 @@ describe('HTTP POST', () => {
     }
     await api
       .post('/api/blogs')
+      .set({ 'Authorization': token })
       .send(invalidBlog)
       .expect(400)
 
@@ -104,8 +128,39 @@ describe('HTTP POST', () => {
     }
     await api
       .post('/api/blogs')
+      .set({ 'Authorization': token })
       .send(invalidBlog)
       .expect(400)
+
+    const response = await api.get('/api/blogs')
+    expect(response.body).toHaveLength(helper.blogs.length)
+  })
+  test('posting with malformatted token causes error and doesnt add blog to list', async () => {
+    const validBlog = {
+      title: 'title',
+      author: 'testi',
+      url: 'url'
+    }
+    await api
+      .post('/api/blogs')
+      .set({ 'Authorization': 'Bearer adsasdasd' })
+      .send(validBlog)
+      .expect(401)
+
+    const response = await api.get('/api/blogs')
+    expect(response.body).toHaveLength(helper.blogs.length)
+  })
+  test('posting with invalid token causes error and doesnt add blog to list', async () => {
+    const validBlog = {
+      title: 'title',
+      author: 'testi',
+      url: 'url',
+    }
+    await api
+      .post('/api/blogs')
+      .set({ 'Authorization': invalidToken })
+      .send(validBlog)
+      .expect(401)
 
     const response = await api.get('/api/blogs')
     expect(response.body).toHaveLength(helper.blogs.length)
