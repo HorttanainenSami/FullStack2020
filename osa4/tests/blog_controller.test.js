@@ -9,31 +9,51 @@ const app = require('../App')
 const config = require('../utils/config')
 
 const api = supertest(app)
-let token
-let invalidToken
+let tokenSami
+let tokenJoni
+
 beforeAll(async () => {
   await User.deleteMany({})
   const passwordHash = await bcrypt.hash('asd', 10)
-  const user = new User({
+  const sami = new User({
     username: 'sami',
     name: 'sami',
     passwordHash,
   })
-  await user.save()
-  const initialUser = await User.findOne({ username: user.username })
-  const userToken = {
-    username: initialUser.username,
-    id: initialUser._id,
+  const joni = new User({
+    username: 'joni',
+    name: 'joni',
+    passwordHash,
+  })
+  await sami.save()
+  await joni.save()
+  const initialSami = await User.findOne({ username: sami.username })
+  const initialJoni = await User.findOne({ username: joni.username })
+  const samiToken = {
+    username: initialSami.username,
+    id: initialSami._id,
   }
-  token = 'Bearer '.concat(jwt.sign(userToken, config.SECRET))
-  invalidToken = 'Bearer '.concat(jwt.sign('asd', config.SECRET))
-})
-beforeEach(async () => {
-  await Blog.deleteMany({})
-  await Blog.insertMany(helper.blogs)
+  const joniToken = {
+    username: initialJoni.username,
+    id: initialJoni._id,
+  }
+  tokenSami = 'Bearer '.concat(jwt.sign(samiToken, config.SECRET))
+  tokenJoni = 'Bearer '.concat(jwt.sign(joniToken, config.SECRET))
 })
 
-describe('HTTP GET', () => {
+describe('one blog added to initialBlogs', () => {
+  beforeEach(async () => {
+    await Blog.deleteMany({})
+    const blog1 = {
+      title: 'asd1',
+      author: 'asd1',
+      url: 'asd1',
+    }
+    await api
+      .post('/api/blogs')
+      .set({ 'Authorization': tokenSami })
+      .send(blog1)
+  })
   test('Blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
@@ -43,17 +63,17 @@ describe('HTTP GET', () => {
   test('there are correct sum of blogs', async () => {
     const blogs = await api.get('/api/blogs')
 
-    expect(blogs.body).toHaveLength(helper.blogs.length)
+    expect(blogs.body).toHaveLength(1)
   })
 
-  test('first title is React patterns', async () => {
+  test('first title is asd1', async () => {
     const response = await api.get('/api/blogs')
 
     const content = response.body.map(r => r.title)
-    expect(content[0]).toContain('React patterns')
+    expect(content[0]).toContain('asd1')
   })
 
-  test('returned document has key:id', async () => {
+  test('returned document has key id', async () => {
     const response = await api.get('/api/blogs')
     const firstItem = response.body[0]
     expect(firstItem.id).toBeDefined()
@@ -63,9 +83,68 @@ describe('HTTP GET', () => {
     const firstBlog = response.body[0]
     expect(firstBlog.__id).not.toBeDefined()
   })
-})
-describe('HTTP POST', () => {
+  test('deleting successfully when id is valid and valid token', async () => {
+    const initialBlogs = await api.get('/api/blogs')
+    const firstBlogId = initialBlogs.body[0].id
+
+    await api
+      .delete(`/api/blogs/${firstBlogId}`)
+      .set({'Authorization': tokenSami })
+      .expect(204)
+    const blogs = await api.get('/api/blogs')
+    expect(blogs.body).toHaveLength(initialBlogs.body.length - 1)
+  })
+  test('deleting fails when id is malformatted', async () => {
+    const initialBlogs = await api.get('/api/blogs')
+
+    await api
+      .delete('/api/blogs/1234')
+      .set({ 'Authorization': tokenSami })
+      .expect(400)
+
+    const blogs = await api.get('/api/blogs')
+    expect(blogs.body).toHaveLength(initialBlogs.body.length)
+  })
+  test('deleting with not existant id doesnt remove from list', async () => {
+    const initialBlogs = await api.get('/api/blogs')
+    const firstBlogId = initialBlogs.body[0].id
+
+    await api
+      .delete(`/api/blogs/${firstBlogId}`)
+      .set({ 'Authorization': tokenSami })
+      .expect(204)
+
+    await api
+      .delete(`/api/blogs/${firstBlogId}`)
+      .set({ 'Authorization': tokenSami })
+      .expect(404)
+    const blogs = await api.get('/api/blogs')
+    expect(blogs.body).toHaveLength(initialBlogs.body.length - 1)
+  })
+  test('deleting blog what is not created by user returns 401', async () => {
+    const initialBlogs = await api.get('/api/blogs')
+    const blogId = initialBlogs.body[0].id
+    await api
+      .delete(`/api/blogs/${blogId}`)
+      .set({ 'Authorization': tokenJoni })
+      .expect(401)
+    const initialBlogsAfter = await api.get('/api/blogs')
+    expect(initialBlogsAfter.body).toHaveLength(initialBlogs.body.length)
+  })
+    // deleting without token doesnt work
+  test('deleting blog without token returns status 401', async () => {
+    const initialBlogs = await api.get('/api/blogs')
+    const blogId = initialBlogs.body[0].id
+    console.log('poo')
+    await api
+      .delete(`/api/blogs/${blogId}`)
+      .expect(401)
+    console.log('poo2')
+    const blogsAfter = await api.get('/api/blogs')
+    expect(blogsAfter.body).toHaveLength(initialBlogs.body.length)
+  })
   test('a valid blog can be added', async () => {
+    const initialBlogs = await api.get('/api/blogs')
     const newBlog = {
       title: 'testi',
       author: 'bloggaaja',
@@ -74,20 +153,44 @@ describe('HTTP POST', () => {
     }
     await api
       .post('/api/blogs')
-      .set({ 'Authorization': token })
+      .set({ 'Authorization': tokenSami })
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
     const response = await api.get('/api/blogs')
-    expect(response.body).toHaveLength(helper.blogs.length + 1)
+    expect(response.body).toHaveLength(initialBlogs.body.length + 1)
+
+    const content = response.body.map(r => r.author)
+    expect(content).toContain('bloggaaja')
+  })
+})
+describe('list without initialBlogs', () => {
+  beforeEach(async () => {
+    await Blog.deleteMany({})
+  })
+  test('a valid blog can be added', async () => {
+    const initialBlogs = await api.get('/api/blogs')
+    const newBlog = {
+      title: 'testi',
+      author: 'bloggaaja',
+      url: 'http',
+      likes: 1,
+    }
+    await api
+      .post('/api/blogs')
+      .set({ 'Authorization': tokenSami })
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    expect(response.body).toHaveLength(initialBlogs.body.length + 1)
 
     const content = response.body.map(r => r.author)
     expect(content).toContain('bloggaaja')
   })
   test('a valid blog without likes is added with zero likes', async () => {
-    await Blog.deleteMany({})
-
     const newBlog = {
       title: 'testi',
       author: 'bloggaaja',
@@ -96,7 +199,7 @@ describe('HTTP POST', () => {
 
     await api
       .post('/api/blogs')
-      .set({ 'Authorization': token })
+      .set({ 'Authorization': tokenSami })
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -113,12 +216,12 @@ describe('HTTP POST', () => {
     }
     await api
       .post('/api/blogs')
-      .set({ 'Authorization': token })
+      .set({ 'Authorization': tokenSami })
       .send(invalidBlog)
       .expect(400)
 
     const response = await api.get('/api/blogs')
-    expect(response.body).toHaveLength(helper.blogs.length)
+    expect(response.body).toHaveLength(0)
   })
   test('a blog without title is not added to db', async () => {
     const invalidBlog = {
@@ -128,18 +231,18 @@ describe('HTTP POST', () => {
     }
     await api
       .post('/api/blogs')
-      .set({ 'Authorization': token })
+      .set({ 'Authorization': tokenSami })
       .send(invalidBlog)
       .expect(400)
 
     const response = await api.get('/api/blogs')
-    expect(response.body).toHaveLength(helper.blogs.length)
+    expect(response.body).toHaveLength(0)
   })
   test('posting with malformatted token causes error and doesnt add blog to list', async () => {
     const validBlog = {
       title: 'title',
       author: 'testi',
-      url: 'url'
+      url: 'url',
     }
     await api
       .post('/api/blogs')
@@ -148,9 +251,9 @@ describe('HTTP POST', () => {
       .expect(401)
 
     const response = await api.get('/api/blogs')
-    expect(response.body).toHaveLength(helper.blogs.length)
+    expect(response.body).toHaveLength(0)
   })
-  test('posting with invalid token causes error and doesnt add blog to list', async () => {
+  test('posting without token causes error and doesnt add blog to list', async () => {
     const validBlog = {
       title: 'title',
       author: 'testi',
@@ -158,48 +261,11 @@ describe('HTTP POST', () => {
     }
     await api
       .post('/api/blogs')
-      .set({ 'Authorization': invalidToken })
       .send(validBlog)
       .expect(401)
 
     const response = await api.get('/api/blogs')
-    expect(response.body).toHaveLength(helper.blogs.length)
-  })
-})
-describe('DELETE', () => {
-  test('deleting successfully when id is valid', async () => {
-    const initialBlogs = await api.get('/api/blogs')
-    const firstBlogId = initialBlogs.body[0].id
-
-    await api
-      .delete(`/api/blogs/${firstBlogId}`)
-      .expect(204)
-    const blogs = await api.get('/api/blogs')
-    expect(blogs.body).toHaveLength(initialBlogs.body.length - 1)
-  })
-  test('deleting fails when id is malformatted', async () => {
-    const initialBlogs = await api.get('/api/blogs')
-
-    await api
-      .delete('/api/blogs/1234')
-      .expect(400)
-
-    const blogs = await api.get('/api/blogs')
-    expect(blogs.body).toHaveLength(initialBlogs.body.length)
-  })
-  test('deleting with not existant id doesnt remove from list', async () => {
-    const initialBlogs = await api.get('/api/blogs')
-    const firstBlogId = initialBlogs.body[0].id
-
-    await api
-      .delete(`/api/blogs/${firstBlogId}`)
-      .expect(204)
-
-    await api
-      .delete(`/api/blogs/${firstBlogId}`)
-      .expect(204)
-    const blogs = await api.get('/api/blogs')
-    expect(blogs.body).toHaveLength(initialBlogs.body.length - 1)
+    expect(response.body).toHaveLength(0)
   })
 })
 

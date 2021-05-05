@@ -9,21 +9,13 @@ blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 })
   response.status(200).json(blogs.map((blog) => blog.toJSON()))
 })
-const getTokenFrom = (request) => {
-  const authorization = request.get('authorization')
-  if (authorization && authorization.toLowerCase().startsWith('bearer')) {
-    return authorization.substring(7)
-  }
-  return null
-}
 
 blogsRouter.post('/', async (request, response) => {
   const bodyUrl = request.body.url
   const bodyTitle = request.body.title
 
-  const token = getTokenFrom(request)
-  const verification = jwt.verify(token, config.SECRET)
-  if (!token || !verification.id) {
+  const verification = jwt.verify(request.token, config.SECRET)
+  if (!request.token || !verification.id) {
     return response.status(401).json({ error: 'token is missing or invalid' })
   }
   if (!bodyUrl || !bodyTitle) {
@@ -47,6 +39,17 @@ blogsRouter.post('/', async (request, response) => {
   response.status(201).json(savedBlog)
 })
 blogsRouter.delete('/:id', async (request, response) => {
+  const decodedToken = jwt.verify(request.token, config.SECRET)
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token is missing or invalid' })
+  }
+  const blog = await Blog.findById(request.params.id).populate('user', { username: 1, id: 1 })
+  if (!blog) {
+    return response.status(404).json({ error: 'Blog with given id is not found' })
+  }
+  if (blog.user.id !== decodedToken.id) {
+    return response.status(401).json({ error: 'you dont have authorization to remove blog' })
+  }
   await Blog.findByIdAndDelete(request.params.id)
   response.status(204).end()
 })
