@@ -51,9 +51,10 @@ describe('one blog added to initialBlogs', () => {
     }
     await api
       .post('/api/blogs')
-      .set({ 'Authorization': tokenSami })
+      .set('Authorization', tokenSami)
       .send(blog1)
   })
+
   test('Blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
@@ -89,7 +90,7 @@ describe('one blog added to initialBlogs', () => {
 
     await api
       .delete(`/api/blogs/${firstBlogId}`)
-      .set({'Authorization': tokenSami })
+      .set('Authorization', tokenSami)
       .expect(204)
     const blogs = await api.get('/api/blogs')
     expect(blogs.body).toHaveLength(initialBlogs.body.length - 1)
@@ -99,7 +100,7 @@ describe('one blog added to initialBlogs', () => {
 
     await api
       .delete('/api/blogs/1234')
-      .set({ 'Authorization': tokenSami })
+      .set('Authorization', tokenSami)
       .expect(400)
 
     const blogs = await api.get('/api/blogs')
@@ -111,12 +112,12 @@ describe('one blog added to initialBlogs', () => {
 
     await api
       .delete(`/api/blogs/${firstBlogId}`)
-      .set({ 'Authorization': tokenSami })
+      .set('Authorization', tokenSami)
       .expect(204)
 
     await api
       .delete(`/api/blogs/${firstBlogId}`)
-      .set({ 'Authorization': tokenSami })
+      .set('Authorization', tokenSami)
       .expect(404)
     const blogs = await api.get('/api/blogs')
     expect(blogs.body).toHaveLength(initialBlogs.body.length - 1)
@@ -126,7 +127,7 @@ describe('one blog added to initialBlogs', () => {
     const blogId = initialBlogs.body[0].id
     await api
       .delete(`/api/blogs/${blogId}`)
-      .set({ 'Authorization': tokenJoni })
+      .set('Authorization', tokenJoni)
       .expect(401)
     const initialBlogsAfter = await api.get('/api/blogs')
     expect(initialBlogsAfter.body).toHaveLength(initialBlogs.body.length)
@@ -153,7 +154,7 @@ describe('one blog added to initialBlogs', () => {
     }
     await api
       .post('/api/blogs')
-      .set({ 'Authorization': tokenSami })
+      .set('Authorization', tokenSami)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -168,6 +169,8 @@ describe('one blog added to initialBlogs', () => {
 describe('list without initialBlogs', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
+    const blogs = await Blog.find({})
+    const user = await User.find({})
   })
   test('a valid blog can be added', async () => {
     const initialBlogs = await api.get('/api/blogs')
@@ -179,7 +182,7 @@ describe('list without initialBlogs', () => {
     }
     await api
       .post('/api/blogs')
-      .set({ 'Authorization': tokenSami })
+      .set('Authorization', tokenSami)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -199,7 +202,7 @@ describe('list without initialBlogs', () => {
 
     await api
       .post('/api/blogs')
-      .set({ 'Authorization': tokenSami })
+      .set('Authorization', tokenSami)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -216,7 +219,7 @@ describe('list without initialBlogs', () => {
     }
     await api
       .post('/api/blogs')
-      .set({ 'Authorization': tokenSami })
+      .set('Authorization', tokenSami)
       .send(invalidBlog)
       .expect(400)
 
@@ -231,7 +234,7 @@ describe('list without initialBlogs', () => {
     }
     await api
       .post('/api/blogs')
-      .set({ 'Authorization': tokenSami })
+      .set('Authorization', tokenSami)
       .send(invalidBlog)
       .expect(400)
 
@@ -246,7 +249,7 @@ describe('list without initialBlogs', () => {
     }
     await api
       .post('/api/blogs')
-      .set({ 'Authorization': 'Bearer adsasdasd' })
+      .set('Authorization', 'Bearer adsasdasd')
       .send(validBlog)
       .expect(401)
 

@@ -32,9 +32,8 @@ blogsRouter.post('/', async (request, response) => {
   // save blog
   const savedBlog = await blog.save()
   // add blog to user
-  const user = await User.findById(verification.id)
-  user.blogs = user.blogs.concat(savedBlog._id)
-  await user.save()
+  request.user.blogs = request.user.blogs.concat(savedBlog._id)
+  await request.user.save()
 
   response.status(201).json(savedBlog)
 })
@@ -51,6 +50,9 @@ blogsRouter.delete('/:id', async (request, response) => {
     return response.status(401).json({ error: 'you dont have authorization to remove blog' })
   }
   await Blog.findByIdAndDelete(request.params.id)
+  request.user.blogs = request.user.blogs
+    .filter(initialBlog => initialBlog.id !== request.params.id)
+  await request.user.save()
   response.status(204).end()
 })
 
