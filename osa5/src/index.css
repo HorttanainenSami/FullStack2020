@@ -1,0 +1,18 @@
+.error {
+  color:red;
+  font-style:italic;
+  font-size:32;
+  border-style:solid;
+  border-radius:15px;
+  padding:10px;
+  margin-bottom:10px;
+}
+.success{
+  color:green;
+  font-style:italic;
+  font-size:32;
+  border-style:solid;
+  border-radius:15px;
+  padding:10px;
+  margin-bottom:10px;
+}

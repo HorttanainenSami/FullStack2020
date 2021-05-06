@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import Notification from './components/Notification'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -11,6 +12,7 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const [notification, setNotification] = useState(null)
 
   useEffect(() => {
     blogService.getAll()
@@ -25,6 +27,12 @@ const App = () => {
       blogService.setToken(storedUser.token)
     }
   }, [])
+  const notify = (message, type = 'success') => {
+    setNotification({ message, type })
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+  }
   const handleLogin = async (event) => {
     event.preventDefault()
     console.log(`login with username ${username} and pass ${password}`)
@@ -33,20 +41,18 @@ const App = () => {
       window.localStorage.setItem('loggedBlogUser', JSON.stringify(loginUser))
       blogService.setToken(loginUser.token)
       setUser(loginUser)
-      console.log(loginUser)
     } catch (exception) {
-      console.log(exception.response.data.error)
+      notify(exception.response.data.error, 'error')
     }
   }
   const addBlog = async (event) => {
     event.preventDefault()
     try {
-      console.log('create')
       const newBlog = await blogService.create({ title, author, url })
-      console.log('created')
       setBlogs(blogs.concat(newBlog))
+      notify(`${newBlog.title} added to server`)
     } catch (exception) {
-      console.log(exception.response.data.error)
+      notify(exception.response.data.error)
     }
   }
   const handleLogout = () => {
@@ -113,6 +119,7 @@ const App = () => {
   )
   return (
     <div>
+      <Notification notification={notification} />
       {user === null
         ? loginForm()
         : loggedinUI()}
