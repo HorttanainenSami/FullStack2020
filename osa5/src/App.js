@@ -56,6 +56,10 @@ const App = () => {
     setUser(null)
     window.localStorage.clear()
   }
+  const increaseLikes = async (blogObject) => {
+    const response = await blogService.update(blogObject)
+    setBlogs(blogs.map(blog => blog.id === response.id ? response : blog))
+  }
   const logged = () => (
     <>
       <div>
@@ -66,7 +70,7 @@ const App = () => {
         <BlogForm createBlog={addBlog}/>
       </Toggleable>
       <div>
-        {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
+        {blogs.map(blog => <Blog key={blog.id} increase={increaseLikes} blog={blog} />)}
       </div>
     </>
   )
