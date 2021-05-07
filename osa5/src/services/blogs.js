@@ -4,7 +4,7 @@ const baseUrl = 'http://localhost:3001/api/blogs'
 let token = null
 
 const setToken = (newToken) => {
-    token = `bearer ${newToken}`
+  token = `bearer ${newToken}`
 }
 const getAll = () => {
   const result = axios.get(baseUrl)
