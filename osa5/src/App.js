@@ -40,6 +40,10 @@ const App = () => {
       notify(exception.response.data.error, 'error')
     }
   }
+  const handleLogout = () => {
+    setUser(null)
+    window.localStorage.clear()
+  }
   const saveLoggedinUser = (user) => {
     window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
     blogService.setToken(user.token)
@@ -54,9 +58,17 @@ const App = () => {
       notify(exception.response.data.error)
     }
   }
-  const handleLogout = () => {
-    setUser(null)
-    window.localStorage.clear()
+  const deleteBlog = async (id) => {
+    console.log(`remove ${id}`)
+    //delete blog from server
+    try {
+      await blogService.remove(id)
+      setBlogs(blogs.filter(blog => blog.id !== id))
+      notify('removing blog was successful')
+    } catch (exception) {
+      notify(exception.response.data.error, 'error')
+    }
+    //delete blog from state
   }
   const increaseLikes = async (blogObject) => {
     const response = await blogService.update(blogObject)
@@ -81,7 +93,7 @@ const App = () => {
     }
     return(
       <div>
-        {blogs.sort(compareTo).map(blog => <Blog key={blog.id} increase={increaseLikes} blog={blog} />)}
+        {blogs.sort(compareTo).map(blog => <Blog key={blog.id} increase={increaseLikes} blog={blog} removeFromServer={deleteBlog} user={user} />)}
       </div>
     )
   }

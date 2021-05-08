@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const Blog = ({ blog, increase }) => {
+const Blog = ({ blog, removeFromServer, increase, user }) => {
   const [visible, setVisible] = useState(false)
   const showWhenVisible ={ display: visible ? '' : 'none' }
   const style = {
@@ -10,9 +10,12 @@ const Blog = ({ blog, increase }) => {
   }
   const increaseLikes = (event) => {
     event.preventDefault()
-    console.log(`blog with id: ${blog.id} likes increaded to ${blog.likes + 1}`)
+    console.log(`blog with id: ${blog.id} likes increaced to ${blog.likes + 1}`)
     increase(blog)
-
+  }
+  const deleteBlog = () => {
+    const result = window.confirm(`Removing blog ${blog.title} by ${blog.author}`)
+    result && removeFromServer(blog.id)
   }
   return(
     <li>
@@ -25,6 +28,7 @@ const Blog = ({ blog, increase }) => {
           <div>{blog.url}</div>
           <div>likes {blog.likes} <button onClick={increaseLikes}> like</button></div>
           <div>{blog.user.username}</div>
+          {blog.user.id === user.id && <button onClick={deleteBlog}>delete</button>}
         </div>
 
       </div>
