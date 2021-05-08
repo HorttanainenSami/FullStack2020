@@ -35,12 +35,15 @@ const App = () => {
   const handleLogin = async (loginObject) => {
     try {
       const loginUser = await loginService.login(loginObject)
-      window.localStorage.setItem('loggedBlogUser', JSON.stringify(loginUser))
-      blogService.setToken(loginUser.token)
-      setUser(loginUser)
+      saveLoggedinUser(loginUser)
     } catch (exception) {
       notify(exception.response.data.error, 'error')
     }
+  }
+  const saveLoggedinUser = (user) => {
+    window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
+    blogService.setToken(user.token)
+    setUser(user)
   }
   const addBlog = async (blogObject) => {
     try {
@@ -52,7 +55,6 @@ const App = () => {
     }
   }
   const handleLogout = () => {
-    console.log('logout')
     setUser(null)
     window.localStorage.clear()
   }
@@ -60,7 +62,7 @@ const App = () => {
     const response = await blogService.update(blogObject)
     setBlogs(blogs.map(blog => blog.id === response.id ? response : blog))
   }
-  const logged = () => (
+  const loggedinView = () => (
     <>
       <div>
         {user.username} logged in
@@ -69,11 +71,20 @@ const App = () => {
       <Toggleable buttonLabel='create new'>
         <BlogForm createBlog={addBlog}/>
       </Toggleable>
-      <div>
-        {blogs.map(blog => <Blog key={blog.id} increase={increaseLikes} blog={blog} />)}
-      </div>
+      {showBlogs()}
     </>
   )
+  const showBlogs = () => {
+
+    const compareTo = (first, second) => {
+      return second.likes-first.likes
+    }
+    return(
+      <div>
+        {blogs.sort(compareTo).map(blog => <Blog key={blog.id} increase={increaseLikes} blog={blog} />)}
+      </div>
+    )
+  }
   return (
     <div>
       <Notification notification={notification} />
@@ -82,7 +93,7 @@ const App = () => {
         ? <Toggleable buttonLabel='login'>
           <LoginForm login={handleLogin} />
         </Toggleable>
-        : logged()}
+        : loggedinView()}
     </div>
   )
 }
