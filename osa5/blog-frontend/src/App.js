@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -52,6 +52,7 @@ const App = () => {
   const addBlog = async (blogObject) => {
     try {
       const newBlog = await blogService.create(blogObject)
+      blogFormRef.current.toggleVisibility()
       setBlogs(blogs.concat(newBlog))
       notify(`${newBlog.title} added to server`)
     } catch (exception) {
@@ -74,13 +75,14 @@ const App = () => {
     const response = await blogService.update(blogObject)
     setBlogs(blogs.map(blog => blog.id === response.id ? response : blog))
   }
+  const blogFormRef = useRef()
   const loggedinView = () => (
     <>
       <div>
         {user.username} logged in
         <button onClick={handleLogout}>logout </button>
       </div>
-      <Toggleable buttonLabel='create new'>
+      <Toggleable buttonLabel='create new' ref={blogFormRef}>
         <BlogForm createBlog={addBlog}/>
       </Toggleable>
       {showBlogs()}
@@ -100,7 +102,7 @@ const App = () => {
   return (
     <div>
       <Notification notification={notification} />
-      <h1> Blogs applicaion </h1>
+      <h1> Blogs application </h1>
       {user === null
         ? <Toggleable buttonLabel='login'>
           <LoginForm login={handleLogin} />
