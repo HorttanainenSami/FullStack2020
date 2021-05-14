@@ -31,6 +31,7 @@ blogsRouter.post('/', async (request, response) => {
   })
   // save blog
   const savedBlog = await blog.save()
+  await Blog.populate(savedBlog, { path: 'user', select: 'username name id' })
   // add blog to user
   request.user.blogs = request.user.blogs.concat(savedBlog._id)
   await request.user.save()
@@ -69,9 +70,22 @@ blogsRouter.put('/:id', async (request, response) => {
   if (!user) {
     return response.status(401).json({ error: 'you dont have authorization to update blog' })
   }
-  blog.likes += 1
-  const savedBlog = await blog.save()
-  response.status(200).json(savedBlog)
+  if (!request.body.url || !request.body.title) {
+    return response.status(400).json({ error: 'url and title is required' })
+  }
+  // add creator to blog
+  const newblog = new Blog({
+    title: request.body.title,
+    author: request.body.author,
+    url: request.body.url,
+    likes: request.body.likes,
+    user: request.body.user,
+    _id: request.params.id,
+  })
+  // update blog
+  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, newblog, { new: true })
+  await Blog.populate(updatedBlog, { path: 'user', select: 'username name id' })
+  response.status(200).json(updatedBlog)
 })
 
 module.exports = blogsRouter
