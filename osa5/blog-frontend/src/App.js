@@ -56,7 +56,7 @@ const App = () => {
       setBlogs(blogs.concat(newBlog))
       notify(`${newBlog.title} added to server`)
     } catch (exception) {
-      notify(exception.response.data.error)
+      notify(exception.response.data.error, 'error')
     }
   }
   const deleteBlog = async (id) => {

@@ -11,8 +11,15 @@ const Blog = ({ blog, removeFromServer, increase, user }) => {
   }
   const increaseLikes = (event) => {
     event.preventDefault()
-    console.log(`blog with id: ${blog.id} likes increaced to ${blog.likes + 1}`)
-    increase(blog)
+    const newBlog = {
+      user: blog.user,
+      author: blog.author,
+      title: blog.title,
+      url: blog.url,
+      likes:blog.likes + 1,
+      id: blog.id,
+    }
+    increase(newBlog)
   }
   const deleteBlog = () => {
     const result = window.confirm(`Removing blog ${blog.title} by ${blog.author}`)
@@ -21,11 +28,11 @@ const Blog = ({ blog, removeFromServer, increase, user }) => {
   return(
     <li>
       <div style = {style}>
-        <div>
+        <div className='content'>
           {blog.title} {blog.author} <button onClick={() => setVisible(!visible)}> {visible ? 'hide' : 'view'} </button>
         </div>
 
-        <div style = {showWhenVisible}>
+        <div className='togglableContent' style = {showWhenVisible}>
           <div>{blog.url}</div>
           <div>likes {blog.likes} <button onClick={increaseLikes}> like</button></div>
           <div>{blog.user.username}</div>
