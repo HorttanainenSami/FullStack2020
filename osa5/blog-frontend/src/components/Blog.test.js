@@ -1,9 +1,10 @@
 import React from 'react'
 import '@testing-library/jest-dom/extend-expect'
-import { render } from '@testing-library/react'
+import { render, fireEvent } from '@testing-library/react'
 import Blog from './Blog'
 describe('<Blog />', () => {
   let component
+  let mockRemove, mockIncrease
   beforeEach(() => {
     const user = {
       username: 'käyttäjä',
@@ -17,10 +18,10 @@ describe('<Blog />', () => {
       likes: 1,
       user,
     }
-    const mockHandlerRemove = jest.fn()
-    const mockHandlerIncrease = jest.fn()
+    mockRemove = jest.fn()
+    mockIncrease = jest.fn()
     component = render(
-      <Blog blog={blog} user={user} removeFromServer={mockHandlerRemove} increase={mockHandlerIncrease} />
+      <Blog blog={blog} user={user} removeFromServer={mockRemove} increase={mockIncrease} />
     )
   })
 
@@ -38,5 +39,10 @@ describe('<Blog />', () => {
     const togglable = component.container.querySelector('.togglableContent')
     expect(togglable).toHaveStyle('display: none')
   })
-  
+  test('Clicking button reveals url and likes', async () => {
+    const button = component.getByText('view')
+    fireEvent.click(button)
+    const togglable = component.container.querySelector('.togglableContent')
+    expect(togglable).not.toHaveStyle('display: none')
+  })
 })
