@@ -45,4 +45,15 @@ describe('<Blog />', () => {
     const togglable = component.container.querySelector('.togglableContent')
     expect(togglable).not.toHaveStyle('display: none')
   })
+  test('Cliking like button once calls eventhandler once', () => {
+    const button = component.getByText('like')
+    fireEvent.click(button)
+    expect(mockIncrease.mock.calls).toHaveLength(1)
+  })
+  test('Cliking like button twice calls eventhandler once', () => {
+    const button = component.getByText('like')
+    fireEvent.click(button)
+    fireEvent.click(button)
+    expect(mockIncrease.mock.calls).toHaveLength(2)
+  })
 })
