@@ -3,6 +3,9 @@ describe('Blog app', function() {
     cy.request('POST', 'http://localhost:3001/api/testing/reset')
 
     cy.request('POST', 'http://localhost:3001/api/users', {
+      username: 'testi1', password: 'salainen'
+    })
+    cy.request('POST', 'http://localhost:3001/api/users', {
       username: 'testi', password: 'salainen'
     })
     localStorage.removeItem('loggedBlogUser')
@@ -72,7 +75,7 @@ describe('Blog app', function() {
         cy.get('#test_title').contains('1')
       })
     })
-    describe.only('when logged in and db contains multiple blogs', function() {
+    describe('when logged in and db contains multiple blogs', function() {
       beforeEach(function () {
         cy.login({ username: 'testi', password: 'salainen' })
         cy.createBlog({ title: 'first title', author:'first author', url: 'first url' })
@@ -84,11 +87,24 @@ describe('Blog app', function() {
         cy.get('#second_title').find('#like-btn').click()
         cy.get('#second_title').contains('likes').contains('1')
       })
-      it.only('Liking second blog sorts second blog to top', function () {
+      it('Liking second blog sorts second blog to top', function () {
         cy.get('#second_title').contains('view').click()
         cy.get('#second_title').find('#like-btn').click()
         cy.log('list updating').wait(1000)
         cy.get('li').contains('second title')
+      })
+      it('Removing blog works when removing own creation', function () {
+        cy.get('#second_title').contains('view').click()
+        cy.get('#second_title').find('#delete-btn').click()
+        cy.get('.success').should('contain', 'removing blog was successful')
+          .and('have.css', 'color', 'rgb(0, 128, 0)')
+          .and('have.css', 'border-style', 'solid')
+      })
+      it('Delete button of blog is not visible is not rendered when blog is not created by user', function () {
+        cy.contains('logout').click()
+        cy.login({ username: 'testi1', password: 'salainen' })
+        cy.get('#second_title').contains('view').click()
+        cy.get('#second_title').not('#delete-btn')
       })
     })
   })
