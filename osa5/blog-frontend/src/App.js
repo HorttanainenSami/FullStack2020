@@ -94,9 +94,9 @@ const App = () => {
       return second.likes-first.likes
     }
     return(
-      <div>
+      <ul>
         {blogs.sort(compareTo).map(blog => <Blog key={blog.id} increase={increaseLikes} blog={blog} removeFromServer={deleteBlog} user={user} />)}
-      </div>
+      </ul>
     )
   }
   return (
