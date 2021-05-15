@@ -87,11 +87,25 @@ describe('Blog app', function() {
         cy.get('#second_title').find('#like-btn').click()
         cy.get('#second_title').contains('likes').contains('1')
       })
-      it('Liking second blog sorts second blog to top', function () {
+      it('Liking second blog sorts blog with most likes to top', function () {
+        cy.get('#first_title').contains('view').click()
         cy.get('#second_title').contains('view').click()
-        cy.get('#second_title').find('#like-btn').click()
-        cy.log('list updating').wait(1000)
-        cy.get('li').contains('second title')
+        cy.get('#third_title').contains('view').click()
+        cy.get('#second_title').find('#like-btn').click().wait(1000)
+        cy.get('#second_title').find('#like-btn').click().wait(1000)
+        cy.get('#third_title').find('#like-btn').click().wait(1000)
+        cy.get('#third_title').find('#like-btn').click().wait(1000)
+        cy.get('#third_title').find('#like-btn').click().wait(1000)
+        cy.log('wait list to get sorted').wait(1000)
+        cy.get('li').each((item, index, list) => {
+          if (index===0) {
+            expect(item[0].id).to.equal('third_title')
+          }else if (index===1) {
+            expect(item[0].id).to.equal('second_title')
+          }else if (index===2) {
+            expect(item[0].id).to.equal('first_title')
+          }
+        })
       })
       it('Removing blog works when removing own creation', function () {
         cy.get('#second_title').contains('view').click()
