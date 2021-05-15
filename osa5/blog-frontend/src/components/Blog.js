@@ -26,7 +26,7 @@ const Blog = ({ blog, removeFromServer, increase, user }) => {
     result && removeFromServer(blog.id)
   }
   return(
-    <li>
+    <li id ={blog.title.replace(/ /g,'_')}>
       <div style = {style}>
         <div className='content'>
           {blog.title} {blog.author} <button onClick={() => setVisible(!visible)}> {visible ? 'hide' : 'view'} </button>
@@ -34,7 +34,7 @@ const Blog = ({ blog, removeFromServer, increase, user }) => {
 
         <div className='togglableContent' style = {showWhenVisible}>
           <div>{blog.url}</div>
-          <div>likes {blog.likes} <button onClick={increaseLikes}> like</button></div>
+          <div>likes {blog.likes} <button id = 'like-btn' onClick={increaseLikes}> like</button></div>
           <div>{blog.user.username}</div>
           {blog.user.id === user.id && <button onClick={deleteBlog}>delete</button>}
         </div>

@@ -34,7 +34,7 @@ describe('Blog app', function() {
         .and('have.css', 'color', 'rgb(255, 0, 0)')
         .and('have.css', 'border-style', 'solid')
     })
-    describe.only('When logged  in', function() {
+    describe('When logged  in', function() {
       beforeEach(function() {
         cy.login({ username: 'testi', password: 'salainen' })
       })
@@ -48,7 +48,47 @@ describe('Blog app', function() {
         cy.get('.success').should('contain', 'title added to server')
           .and('have.css', 'color', 'rgb(0, 128, 0)' )
           .and('have.css', 'border-style', 'solid')
-        cy.get('li').contains('this is test title')
+        cy.contains('this is test title')
+      })
+    })
+    describe('When logged in and db contains one blog', function () {
+      beforeEach(function () {
+        cy.login({ username: 'testi', password: 'salainen' })
+        cy.createBlog({ title: 'test title', author: 'test author', url: 'test url'  })
+      })
+      it('A author and title is displayed', function () {
+        cy.get('.content').should('be.visible')
+      })
+      it('Likes and url is not displayed on default', function () {
+        cy.get('.togglableContent').should('have.css', 'display', 'none')
+      })
+      it('Likes and url can be displayed by pressing button', function () {
+        cy.contains('test title').contains('view').click()
+        cy.get('.togglableContent').should('be.visible')
+      })
+      it('Like can be pressed', function () {
+        cy.get('#test_title').contains('view').click()
+        cy.get('#test_title').get('#like-btn').click()
+        cy.get('#test_title').contains('1')
+      })
+    })
+    describe.only('when logged in and db contains multiple blogs', function() {
+      beforeEach(function () {
+        cy.login({ username: 'testi', password: 'salainen' })
+        cy.createBlog({ title: 'first title', author:'first author', url: 'first url' })
+        cy.createBlog({ title: 'second title', author: 'second author', url: 'second url' })
+        cy.createBlog({ title: 'third title', author: 'third author', url: 'third url' })
+      })
+      it('Liking second blog increments second blog likes', function () {
+        cy.get('#second_title').contains('view').click()
+        cy.get('#second_title').find('#like-btn').click()
+        cy.get('#second_title').contains('likes').contains('1')
+      })
+      it.only('Liking second blog sorts second blog to top', function () {
+        cy.get('#second_title').contains('view').click()
+        cy.get('#second_title').find('#like-btn').click()
+        cy.log('list updating').wait(1000)
+        cy.get('li').contains('second title')
       })
     })
   })
