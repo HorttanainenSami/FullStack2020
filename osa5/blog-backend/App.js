@@ -22,6 +22,10 @@ mongoose.connect(mongoUrl, {
 app.use(cors())
 app.use(express.json())
 app.use(middleware.tokenExtractor)
+if (process.env.NODE_ENV === 'test') {
+  const testingRouter = require('./controllers/testing')
+  app.use('/api/testing', testingRouter)
+}
 app.use('/api/blogs', middleware.userExtractor, blogRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
