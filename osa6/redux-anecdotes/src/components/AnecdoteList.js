@@ -3,15 +3,14 @@ import { incrementVote} from '../reducers/anecdoteReducer'
 import { setNotification, resetNotification } from '../reducers/notificationReducer'
 import { useSelector, useDispatch } from 'react-redux'
 
-
 const AnecdoteList = () => {
 
   const anecdotes = useSelector(state => state.anecdote.filter(anecdote => anecdote.content.toLowerCase().includes(state.filter.toLowerCase())).sort((a,b) => b.votes-a.votes))
   const dispatch = useDispatch()
 
-  const vote = (id, content) => {
-    dispatch(incrementVote(id))
-    dispatch(setNotification(`You voted '${content}' was success` ))
+  const vote = async (anecdote) => {
+    await dispatch(incrementVote(anecdote))
+    dispatch(setNotification(`You voted '${anecdote.content}' was success` ))
     setTimeout( () => {
       dispatch(resetNotification())
     }, 5000)
@@ -26,7 +25,7 @@ const AnecdoteList = () => {
           </div>
           <div>
             has {anecdote.votes}
-            <button onClick={() => vote(anecdote.id, anecdote.content)}>vote</button>
+            <button onClick={() => vote(anecdote)}>vote</button>
           </div>
         </div>
       )}
