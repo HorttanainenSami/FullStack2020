@@ -1,11 +1,23 @@
-export const setNotification = (message) => {
-  return{
-    type: 'SET_NOTIFICATION',
-    data: {
-      message,
-    },
+export const setNotification = (message, duration) => {
+  return async dispatch => {
+
+    await dispatch({
+      type: 'SET_NOTIFICATION',
+      data: {
+        message,
+      },
+    })
+      setTimeout( () => {
+        dispatch({
+          type: 'RESET_NOTIFICATION',
+          data: {
+            message: null,
+          }
+      })
+    }, duration * 1000 )
   }
 }
+
 export const resetNotification = () => {
   return{
     type: 'RESET_NOTIFICATION',
