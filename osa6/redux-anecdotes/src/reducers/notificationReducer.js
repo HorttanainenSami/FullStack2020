@@ -1,13 +1,14 @@
+var timeoutID
 export const setNotification = (message, duration) => {
   return async dispatch => {
-
     await dispatch({
       type: 'SET_NOTIFICATION',
       data: {
         message,
       },
     })
-      setTimeout( () => {
+      clearTimeout(timeoutID)
+      timeoutID = setTimeout( () => {
         dispatch({
           type: 'RESET_NOTIFICATION',
           data: {
