@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Switch, Route, useRouteMatch, Redirect } from 'react-router-dom'
+import { Switch, Route, useRouteMatch } from 'react-router-dom'
 import Anecdote from './components/Anecdote'
 import AnecdoteList from './components/AnecdoteList'
 import Menu from './components/Menu'
