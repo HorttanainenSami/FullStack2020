@@ -16,10 +16,10 @@ const CreateNew = (props) => {
     })
     history.push('/')
   }
-  const reset = () => {
-    author.reset()
-    info.reset()
-    content.reset()
+  const reset = (event) => {
+    content.onChange(event, 'reset')
+    author.onChange(event, 'reset')
+    info.onChange(event, 'reset')
   }
   return (
     <div>
