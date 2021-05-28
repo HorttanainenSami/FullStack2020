@@ -1,0 +1,30 @@
+let timeoutID
+export const setNotification = (message) => {
+  return async dispatch => {
+    await dispatch({
+      type: 'SET_NOTIFICATION',
+      data: message,
+    })
+    clearTimeout(timeoutID)
+
+    timeoutID = setTimeout(() => {
+      dispatch({ type: 'HIDE_NOTIFICATION' })
+    }, 5*1000)
+  }
+}
+export const hideNotification = () => {
+  return {
+    type: 'HIDE_NOTIFICATION',
+  }
+}
+const notificationReducer = (state=null, action) => {
+  switch(action.type) {
+    case 'SET_NOTIFICATION':
+      return action.data
+    case 'HIDE_NOTIFICATION':
+      return null
+    default:
+      return state
+  }
+}
+export default notificationReducer
