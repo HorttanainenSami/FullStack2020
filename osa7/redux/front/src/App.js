@@ -3,30 +3,31 @@ import Blog from './components/Blog'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import NewBlog from './components/NewBlog'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import storage from './utils/storage'
 import { setNotification } from './reducers/notification'
+import { loginUser, logoutUser, checkLogin } from './reducers/login'
+import useField from './hooks/index'
+import { initializeBlogs, updateBlog } from './reducers/blogs'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [user, setUser] = useState(null)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const blogs = useSelector(state => state.blogs)
+  const user = useSelector(state => state.user)
+  const username = useField('text')
+  const password = useField('password')
   const dispatch = useDispatch()
 
   const blogFormRef = React.createRef()
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
+    blogService.getAll().then(blogs =>{
+      dispatch(initializeBlogs(blogs))}
     )
   }, [])
 
   useEffect(() => {
-    const user = storage.loadUser()
-    setUser(user)
+    dispatch(checkLogin(user))
   }, [])
 
   const notifyWith = (message, type='success') => {
@@ -36,15 +37,13 @@ const App = () => {
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
+      console.log(username.value)
       const user = await loginService.login({
-        username, password
+        username: username.value,
+        password: password.value
       })
-
-      setUsername('')
-      setPassword('')
-      setUser(user)
-      notifyWith(`${user.name} welcome back!`)
-      storage.saveUser(user)
+      dispatch(loginUser(user))
+      notifyWith(`${user.username} welcome back!`)
     } catch(exception) {
       notifyWith('wrong username/password', 'error')
     }
@@ -54,7 +53,7 @@ const App = () => {
     try {
       const newBlog = await blogService.create(blog)
       blogFormRef.current.toggleVisibility()
-      setBlogs(blogs.concat(newBlog))
+      //setBlogs(blogs.concat(newBlog))
       notifyWith(`a new blog '${newBlog.title}' by ${newBlog.author} added!`)
     } catch(exception) {
       console.log(exception)
@@ -64,8 +63,8 @@ const App = () => {
   const handleLike = async (id) => {
     const blogToLike = blogs.find(b => b.id === id)
     const likedBlog = { ...blogToLike, likes: blogToLike.likes + 1, user: blogToLike.user.id }
-    await blogService.update(likedBlog)
-    setBlogs(blogs.map(b => b.id === id ?  { ...blogToLike, likes: blogToLike.likes + 1 } : b))
+    const returned = await blogService.update(likedBlog)
+    dispatch(updateBlog(returned))
   }
 
   const handleRemove = async (id) => {
@@ -73,14 +72,13 @@ const App = () => {
     const ok = window.confirm(`Remove blog ${blogToRemove.title} by ${blogToRemove.author}`)
     if (ok) {
       await blogService.remove(id)
-      setBlogs(blogs.filter(b => b.id !== id))
+      //setBlogs(blogs.filter(b => b.id !== id))
       notifyWith('blog removed successfully')
     }
   }
 
   const handleLogout = () => {
-    setUser(null)
-    storage.logoutUser()
+    dispatch(logoutUser())
   }
 
   if ( !user ) {
@@ -93,19 +91,11 @@ const App = () => {
         <form onSubmit={handleLogin}>
           <div>
             username
-            <input
-              id='username'
-              value={username}
-              onChange={({ target }) => setUsername(target.value)}
-            />
+            <input {...username} />
           </div>
           <div>
             password
-            <input
-              id='password'
-              value={password}
-              onChange={({ target }) => setPassword(target.value)}
-            />
+            <input {...password} />
           </div>
           <button id='login'>login</button>
         </form>
@@ -122,7 +112,7 @@ const App = () => {
       <Notification />
 
       <p>
-        {user.name} logged in <button onClick={handleLogout}>logout</button>
+        {user.username} logged in <button onClick={handleLogout}>logout</button>
       </p>
 
       <Togglable buttonLabel='create new blog'  ref={blogFormRef}>

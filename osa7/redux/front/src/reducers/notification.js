@@ -12,11 +12,6 @@ export const setNotification = (message) => {
     }, 5*1000)
   }
 }
-export const hideNotification = () => {
-  return {
-    type: 'HIDE_NOTIFICATION',
-  }
-}
 const notificationReducer = (state=null, action) => {
   switch(action.type) {
     case 'SET_NOTIFICATION':
