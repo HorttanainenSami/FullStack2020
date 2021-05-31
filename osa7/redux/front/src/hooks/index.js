@@ -3,16 +3,22 @@ const useField = (type) => {
   const [value, setValue] = useState('')
 
   const onChange = (event) => {
-    console.log(event.target.value)
     setValue(event.target.value)
   }
-  
-  return {
-    onChange,
-    value,
-    type
+  const reset = () => {
+    setValue('')
   }
+  return ([
+      {
+        onChange,
+        value,
+        type
+      },
+      reset
+    ])
+  
 }
+
 
 
 

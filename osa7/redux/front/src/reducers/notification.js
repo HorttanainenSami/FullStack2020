@@ -1,9 +1,9 @@
 let timeoutID
-export const setNotification = (message) => {
+export const setNotification = (message, type='success') => {
   return async dispatch => {
     await dispatch({
       type: 'SET_NOTIFICATION',
-      data: message,
+      data: { message, type }
     })
     clearTimeout(timeoutID)
 
@@ -12,6 +12,7 @@ export const setNotification = (message) => {
     }, 5*1000)
   }
 }
+
 const notificationReducer = (state=null, action) => {
   switch(action.type) {
     case 'SET_NOTIFICATION':

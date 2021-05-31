@@ -10,10 +10,16 @@ export const updateBlog = (blog) => {
     data: blog
   }
 }
-export const newBlog = (blog) => {
+export const createBlog = (blog) => {
   return  {
     type: 'NEW_BLOG',
     data: blog
+  }
+}
+export const removeBlog = (id) => {
+  return {
+    type: 'REMOVE_BLOG',
+    data: id
   }
 }
 const blogReducer = (state=[], action) => {
@@ -23,7 +29,9 @@ const blogReducer = (state=[], action) => {
     case 'INITIALIZE_BLOGS':
       return action.data
     case 'NEW_BLOG':
-      return state.concat(action.data)
+      return [...state, action.data]
+    case 'REMOVE_BLOG':
+      return state.filter(blog => blog.id !== action.data)
     default:
       return state
   }

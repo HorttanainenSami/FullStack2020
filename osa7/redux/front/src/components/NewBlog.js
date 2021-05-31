@@ -1,17 +1,33 @@
-import React, { useState } from 'react'
+import React from 'react'
+import useField from '../hooks/index'
+import blogService from '../services/blogs'
+import { useDispatch } from 'react-redux'
+import { createBlog } from '../reducers/blogs'
+import { setNotification } from '../reducers/notification'
 
 const NewBlog = (props) => {
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
-
-  const handleNewBlog = (event) => {
+  
+  const [title, setTitle] = useField('text')
+  const [author, setAuthor] = useField('text')
+  const [url, setUrl] = useField('text')
+  const dispatch = useDispatch()
+  const handleNewBlog = async (event) => {
     event.preventDefault()
 
-    props.createBlog({
-      title, author, url
+    const blog = ({
+      title: title.value,
+      author: author.value,
+      url: url.value
     })
 
+    try {
+      const newBlog = await blogService.create(blog)
+      props.blogFormRef.current.toggleVisibility()
+      dispatch(createBlog(newBlog))
+      dispatch(setNotification(`a new blog '${newBlog.title}' by ${newBlog.author} added!`))
+    } catch(exception) {
+      dispatch(setNotification(exception.message, 'error'))
+    }
     setTitle('')
     setAuthor('')
     setUrl('')
@@ -23,27 +39,15 @@ const NewBlog = (props) => {
       <form onSubmit={handleNewBlog}>
         <div>
           author
-          <input
-            id='author'
-            value={author}
-            onChange={({ target }) => setAuthor(target.value)}
-          />
+          <input {...author} />
         </div>
         <div>
           title
-          <input
-            id='title'
-            value={title}
-            onChange={({ target }) => setTitle(target.value)}
-          />
+          <input {...title} />
         </div>
         <div>
           url
-          <input
-            id='url'
-            value={url}
-            onChange={({ target }) => setUrl(target.value)}
-          />
+          <input {...url}/>
         </div>
         <button id="create">create</button>
       </form>
