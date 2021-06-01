@@ -5,9 +5,9 @@ import blogService from '../services/blogs'
 import { removeBlog, initializeBlogs, updateBlog } from '../reducers/blogs'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, handleLike, handleRemove, own }) => {
+const Blog = ({ blog, handleLike, handleRemove, user }) => {
+  const own = user?.id === blog.user.id 
   const [visible, setVisible] = useState(false)
-
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -17,7 +17,6 @@ const Blog = ({ blog, handleLike, handleRemove, own }) => {
   }
 
   const label = visible ? 'hide' : 'view'
-
   return (
     <div style={blogStyle} className='blog'>
       <div>
@@ -27,10 +26,10 @@ const Blog = ({ blog, handleLike, handleRemove, own }) => {
         <div>
           <div>{blog.url}</div>
           <div>likes {blog.likes}
-            <button onClick={() => handleLike(blog.id)}>like</button>
+          {user && <button onClick={() => handleLike(blog.id)}>like</button>}
           </div>
           <div>{blog.user.name}</div>
-          {own&&<button onClick={() => handleRemove(blog.id)}>remove</button>}
+          {own && <button onClick={() => handleRemove(blog.id)}>remove</button>}
         </div>
       )}
     </div>
@@ -38,8 +37,8 @@ const Blog = ({ blog, handleLike, handleRemove, own }) => {
 }
 
 const byLikes = (b1, b2) => b2.likes - b1.likes
-
-const BlogsList = ({ user }) => {
+const BlogsList = ({ userObject }) => {
+  const user = useSelector(state => state.user)
   const dispatch = useDispatch()
 
   const blogs = useSelector(state => state.blogs)
@@ -71,7 +70,7 @@ const BlogsList = ({ user }) => {
         blog={blog}
         handleLike={handleLike}
         handleRemove={handleRemove}
-        own={user.username===blog.user.username}
+        user={user}
         />
     )}
     </>
@@ -85,7 +84,6 @@ Blog.propTypes = {
   }).isRequired,
   handleLike: PropTypes.func.isRequired,
   handleRemove: PropTypes.func.isRequired,
-  own: PropTypes.bool.isRequired
 }
 
 export default BlogsList

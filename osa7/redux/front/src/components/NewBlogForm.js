@@ -1,7 +1,7 @@
 import React from 'react'
 import Togglable from './Togglable'
 import NewBlog from './NewBlog'
-const NewBlogForm = ({ user, handleLogout }) => {
+const NewBlogForm = () => {
   const blogFormRef = React.createRef()
   return(
     <div>
