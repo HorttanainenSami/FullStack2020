@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Switch, Route, Redirect, Link, useParams } from 'react-router-dom'
+import { Switch, Route } from 'react-router-dom'
 import NewBlogForm from './components/NewBlogForm'
 import Notification from './components/Notification'
 import { useDispatch, useSelector } from 'react-redux'
@@ -9,6 +9,8 @@ import BlogsList from './components/BlogsList'
 import LoginForm from './components/LoginForm'
 import User from './components/pages/User'
 import UsersPage from './components/pages/UsersPage'
+import { initializeBlogs } from './reducers/blogs'
+import Blog from './components/pages/Blog'
 const App = () => {
 
   const user = useSelector(state => state.user)
@@ -21,6 +23,10 @@ const App = () => {
   useEffect(() => {
     dispatch(getUsers()) 
   }, [dispatch])
+  useEffect(() => {
+    console.log('initializing')
+    dispatch(initializeBlogs())
+  }, [])
 
   const IndexPage = () => {
     return (
@@ -55,16 +61,20 @@ const App = () => {
   
   return(
     <div>
+      <NavBar />
       <Notification /> 
       <Switch>
         <Route path='/users/:id'>
-          <><NavBar /> <User users={users} /></>
+          <User users={users} />
         </Route>
         <Route path='/users'>
-          <><NavBar /><UsersPage users={users}/></>
+         <UsersPage users={users}/>
+        </Route>
+        <Route path='/blogs/:id'>
+          <Blog user={user} />
         </Route>
         <Route path='/'>
-          <> <NavBar /><IndexPage /></>
+          <IndexPage />
         </Route>
       </Switch>
     </div>
