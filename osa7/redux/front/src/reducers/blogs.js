@@ -1,7 +1,12 @@
-export const initializeBlogs = (blogs) => {
-  return {
-    type: 'INITIALIZE_BLOGS',
-    data: blogs
+import blogService from '../services/blogs'
+
+export const initializeBlogs = () => {
+  return async dispatch => {
+    const blogs = await blogService.getAll()
+    dispatch({
+      type: 'INITIALIZE_BLOGS',
+      data: blogs
+    })
   }
 }
 export const updateBlog = (blog) => {
@@ -27,6 +32,7 @@ const blogReducer = (state=[], action) => {
     case 'UPDATE_BLOG':
       return state.map(blog => blog.id === action.data.id ? action.data:blog)
     case 'INITIALIZE_BLOGS':
+      
       return action.data
     case 'NEW_BLOG':
       return [...state, action.data]

@@ -1,7 +1,7 @@
 let timeoutID
 export const setNotification = (message, type='success') => {
   return async dispatch => {
-    await dispatch({
+    dispatch({
       type: 'SET_NOTIFICATION',
       data: { message, type }
     })

@@ -1,6 +1,6 @@
 import React from 'react'
 import useField from '../hooks/index'
-import loginService from '../services/login'
+import Togglable from './Togglable'
 import { useDispatch } from 'react-redux'
 import { setNotification } from '../reducers/notification'
 import { loginUser } from '../reducers/login'
@@ -13,33 +13,35 @@ const LoginForm = () => {
   const submit = async (event) => {
     event.preventDefault()
     try{
-      const user = await loginService.login({
+      const user = {
         username: username.value,
         password: password.value,
-      })
+      }
       resetUsername()
       resetPassword()
-      dispatch(loginUser(user))
-      dispatch(setNotification(`${user.username} welcome back!`))
+      await dispatch(loginUser(user))
+    
     }catch(exception){
       dispatch(setNotification('Wrong credentials', 'error'))
     }
   }
+  const loginFormRef = React.createRef()
   return (
     <div>
       <h2>login to application</h2>
-
-      <form onSubmit={submit}>
-        <div>
-          username
-          <input {...username} />
-        </div>
-        <div>
-          password
-          <input {...password} />
-        </div>
-        <button id='login'>login</button>
-      </form>
+      <Togglable buttonLabel='Login to application' ref={loginFormRef}>
+        <form onSubmit={submit}>
+          <div>
+            username
+            <input {...username} />
+          </div>
+          <div>
+            password
+            <input {...password} />
+          </div>
+          <button id='login'>login</button>
+        </form>
+      </Togglable>
     </div>
   )
 }

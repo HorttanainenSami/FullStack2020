@@ -41,18 +41,19 @@ const byLikes = (b1, b2) => b2.likes - b1.likes
 
 const BlogsList = ({ user }) => {
   const dispatch = useDispatch()
+
   const blogs = useSelector(state => state.blogs)
   useEffect(() => {
-    blogService.getAll().then(blogs =>{
-      dispatch(initializeBlogs(blogs))}
-    )
-  }, [])
+    dispatch(initializeBlogs())
+  }, [dispatch])
+
   const handleLike = async (id) => {
     const blogToLike = blogs.find(b => b.id === id)
     const likedBlog = { ...blogToLike, likes: blogToLike.likes + 1, user: blogToLike.user.id }
     const returned = await blogService.update(likedBlog)
     dispatch(updateBlog(returned))
   }
+
   const handleRemove = async (id) => {
     const blogToRemove = blogs.find(b => b.id === id)
     const ok = window.confirm(`Remove blog ${blogToRemove.title} by ${blogToRemove.author}`)
@@ -62,6 +63,7 @@ const BlogsList = ({ user }) => {
       dispatch(setNotification('blog removed successfully'))
     }
   }
+
   return(
     <>
     {blogs.sort(byLikes).map(blog => 

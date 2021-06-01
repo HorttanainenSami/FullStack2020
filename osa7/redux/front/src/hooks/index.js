@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import axios from 'axios'
 const useField = (type) => {
   const [value, setValue] = useState('')
 
@@ -18,8 +19,4 @@ const useField = (type) => {
     ])
   
 }
-
-
-
-
 export default useField

@@ -1,4 +1,5 @@
 import storage from '../utils/storage'
+import LoginService from '../services/login'
 
 const loginReducer = (state=null, action) => {
   switch(action.type) {
@@ -14,11 +15,14 @@ const loginReducer = (state=null, action) => {
       return state
   }
 }
-export const loginUser = (user) => {
-  return{
-    type: 'LOGIN',
-    data: user
-  }
+export const loginUser = (credentials) => {
+  return async dispatch => {
+    const user = await LoginService.login(credentials) 
+    dispatch({
+      type: 'LOGIN',
+      data: user
+    })
+   }
 }
 export const checkLogin = () => {
   return{
