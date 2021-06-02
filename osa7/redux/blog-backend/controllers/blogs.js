@@ -2,11 +2,12 @@ const jwt = require('jsonwebtoken')
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const Comment = require('../models/comment')
 const config = require('../utils/config')
 require('express-async-errors')
 
 blogsRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 })
+  const blogs = await Blog.find({}).populate('comments', { message: 1 }).populate('user', { username: 1, name: 1, id: 1 })
   response.status(200).json(blogs.map((blog) => blog.toJSON()))
 })
 
@@ -51,8 +52,9 @@ blogsRouter.delete('/:id', async (request, response) => {
     return response.status(401).json({ error: 'you dont have authorization to remove blog' })
   }
   await Blog.findByIdAndDelete(request.params.id)
+  await Comment.deleteMany({ blog: request.params.id })
   request.user.blogs = request.user.blogs
-    .filter(initialBlog => initialBlog.id !== request.params.id)
+    .filter((initialBlog) => initialBlog.id !== request.params.id)
   await request.user.save()
   response.status(204).end()
 })
@@ -80,6 +82,7 @@ blogsRouter.put('/:id', async (request, response) => {
     url: request.body.url,
     likes: request.body.likes,
     user: request.body.user,
+    comment: request.body.comment,
     _id: request.params.id,
   })
   // update blog

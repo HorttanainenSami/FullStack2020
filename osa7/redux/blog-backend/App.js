@@ -6,6 +6,7 @@ const config = require('./utils/config')
 const blogRouter = require('./controllers/blogs')
 const userRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
+const commentRouter = require('./controllers/comments')
 const middleware = require('./utils/middleware')
 
 const app = express()
@@ -27,6 +28,7 @@ if (process.env.NODE_ENV === 'test') {
   app.use('/api/testing', testingRouter)
 }
 app.use('/api/blogs', middleware.userExtractor, blogRouter)
+app.use('/api/blogs', commentRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
 

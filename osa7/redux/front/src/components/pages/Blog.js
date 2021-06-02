@@ -13,6 +13,7 @@ const Blog = ({ user }) => {
     return null
   }
   const blog = blogs.find(blog => blog.id === id)
+  console.log(blog.comments)
   const own = user?.id === blog.user.id 
 
   const handleLike = async () => {
@@ -43,6 +44,10 @@ const Blog = ({ user }) => {
           <div>added by {blog.user.name}</div>
           {own && <button onClick={() => handleRemove(blog.id)}>remove</button>}
       </div>
+      <h2> Comments </h2>
+      <ul>
+        {blog.comments.map(comment => <li key={comment.id}> {comment.message} </li>)}
+    </ul>
       </div>
   )
 }

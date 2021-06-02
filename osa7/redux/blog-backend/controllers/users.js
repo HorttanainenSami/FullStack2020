@@ -1,10 +1,13 @@
 const bcrypt = require('bcrypt')
 const userRouter = require('express').Router()
 const User = require('../models/user')
+const Blog = require('../models/blog')
 require('express-async-errors')
 
 userRouter.get('/', async (request, response) => {
-  response.json(await User.find({}).populate('blogs', { url: 1, title: 1, author: 1, id: 1 }))
+  response.json(await User.find({}).populate('blogs', {
+    url: 1, title: 1, author: 1, id: 1,
+  }))
 })
 
 class ValidationError extends Error {
@@ -26,6 +29,8 @@ userRouter.post('/', async (request, response) => {
     passwordHash,
   })
   const savedUser = await newUser.save()
+  // save also to blog
+  const blog = Blog
   response.status(201).json(savedUser)
 })
 
