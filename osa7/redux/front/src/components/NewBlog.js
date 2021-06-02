@@ -4,6 +4,7 @@ import blogService from '../services/blogs'
 import { useDispatch } from 'react-redux'
 import { createBlog } from '../reducers/blogs'
 import { setNotification } from '../reducers/notification'
+import Togglable from './Togglable'
 
 const NewBlog = (props) => {
   
@@ -11,6 +12,7 @@ const NewBlog = (props) => {
   const [author, setAuthor] = useField('text')
   const [url, setUrl] = useField('text')
   const dispatch = useDispatch()
+  const blogFormRef = React.createRef()
   const handleNewBlog = async (event) => {
     event.preventDefault()
 
@@ -22,7 +24,7 @@ const NewBlog = (props) => {
 
     try {
       const newBlog = await blogService.create(blog)
-      props.blogFormRef.current.toggleVisibility()
+      blogFormRef.current.toggleVisibility()
       dispatch(createBlog(newBlog))
       dispatch(setNotification(`a new blog '${newBlog.title}' by ${newBlog.author} added!`))
     } catch(exception) {
@@ -32,25 +34,26 @@ const NewBlog = (props) => {
     setAuthor('')
     setUrl('')
   }
-
   return (
     <div>
-      <h2>create new</h2>
-      <form onSubmit={handleNewBlog}>
-        <div>
-          author
-          <input {...author} />
-        </div>
-        <div>
-          title
-          <input {...title} />
-        </div>
-        <div>
-          url
-          <input {...url}/>
-        </div>
-        <button id="create">create</button>
-      </form>
+      <Togglable buttonLabel='create new blog' ref={blogFormRef}>
+        <h2>create new</h2>
+        <form onSubmit={handleNewBlog}>
+          <div>
+            author
+            <input {...author} />
+          </div>
+          <div>
+            title
+            <input {...title} />
+          </div>
+          <div>
+            url
+            <input {...url}/>
+          </div>
+          <button id="create">create</button>
+        </form>
+      </Togglable>
     </div>
   )
 }

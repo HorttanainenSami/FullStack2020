@@ -1,9 +1,13 @@
 import React from 'react'
+import NewBlog from '../NewBlog'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 const byLikes = (b1, b2) => b2.likes - b1.likes
-const BlogsList = ({ userObject }) => {
+
+const BlogsList = () => {
+
+  const blogs = useSelector(state => state.blogs)
 
   const blogStyle = {
     paddingTop: 10,
@@ -12,7 +16,6 @@ const BlogsList = ({ userObject }) => {
     borderWidth: 1,
     marginBottom: 5
   }
-  const blogs = useSelector(state => state.blogs)
 
   return(
     <>
@@ -27,5 +30,13 @@ const BlogsList = ({ userObject }) => {
     )
 }
 
+const IndexPage = ({ user }) => {
+  return (
+    <div>
+      {user && <NewBlog /> }
+      <BlogsList />
+    </div>
+  )
+}
+export default IndexPage
 
-export default BlogsList

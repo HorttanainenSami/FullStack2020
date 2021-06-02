@@ -27,17 +27,29 @@ export const removeBlog = (id) => {
     data: id
   }
 }
+export const commentBlog = (id, message) => {
+  return async dispatch => {
+    const comment = await blogService.createComment(id, message)
+    await dispatch({
+      type: 'COMMENT_BLOG',
+      data: comment
+    })
+  }
+}
 const blogReducer = (state=[], action) => {
   switch(action.type) {
     case 'UPDATE_BLOG':
       return state.map(blog => blog.id === action.data.id ? action.data:blog)
     case 'INITIALIZE_BLOGS':
-      
       return action.data
     case 'NEW_BLOG':
       return [...state, action.data]
     case 'REMOVE_BLOG':
       return state.filter(blog => blog.id !== action.data)
+    case 'COMMENT_BLOG':
+      const commentedBlog = state.find(blog => blog.id === action.data.blog)
+      commentedBlog.comments = commentedBlog.comments.concat(action.data) 
+      return state.map(blog => blog.id === commentedBlog.id ? commentedBlog : blog)
     default:
       return state
   }

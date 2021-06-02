@@ -1,6 +1,8 @@
 import { useParams } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
-const User = ({ users }) => {
+const User = () => {
+  const users = useSelector(state => state.users)
   const id = useParams().id
   const selectedUser = users.find(user => user.id === id )
   const userData = () => {

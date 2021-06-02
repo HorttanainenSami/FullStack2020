@@ -1,5 +1,10 @@
 import { Link } from 'react-router-dom'
-const UsersPage = ({users}) => (
+
+import { useSelector } from 'react-redux'
+const UsersPage = () => {
+  
+  const users = useSelector(state => state.users)
+  return(
   <div>
     <h2> Users </h2>
     <table>
@@ -17,6 +22,7 @@ const UsersPage = ({users}) => (
       </tbody>
     </table>
   </div>
-)
+  )
+}
 
 export default UsersPage
