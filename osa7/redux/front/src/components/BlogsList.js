@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import React from 'react'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 const byLikes = (b1, b2) => b2.likes - b1.likes
 const BlogsList = ({ userObject }) => {
-  const dispatch = useDispatch()
 
   const blogStyle = {
     paddingTop: 10,

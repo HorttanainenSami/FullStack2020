@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route, Link } from 'react-router-dom'
 import NewBlogForm from './components/NewBlogForm'
 import Notification from './components/Notification'
 import { useDispatch, useSelector } from 'react-redux'
@@ -37,31 +37,39 @@ const App = () => {
     )
   }
   const NavBar = () => {
-    if(user) {
-      return(
-        <div>
-          <h2>blogs</h2>
-          <div>
-            <p>{user.username} logged in</p>
-            <button 
-              onClick={() => dispatch(logoutUser())}>
-              logout
-            </button>
-          </div>
-        </div>
-      )
+    const style = {
+      backgroundColor: 'lightgrey',
+      padding: 10,
     }
-    return(
+    const logoutForm = () => (
       <>
-        <h2>blogs</h2>
-        <LoginForm /> 
+      <span><b> {user.username} logged in</b></span>
+        <button 
+          onClick={() => dispatch(logoutUser())}>
+          logout
+        </button>
       </>
-      )
+    )
+
+
+    return(
+      <div style={style}>
+          <Link to='/blogs'>
+            <span> Blogs </span>
+          </Link>
+
+          <Link to='/users'>
+            <span> Users </span>
+          </Link>
+      {user ? logoutForm():<LoginForm /> }
+      </div>
+    )
   }
   
   return(
     <div>
       <NavBar />
+      <h2> Blogs app </h2>
       <Notification /> 
       <Switch>
         <Route path='/users/:id'>

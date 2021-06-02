@@ -27,9 +27,7 @@ const LoginForm = () => {
   }
   const loginFormRef = React.createRef()
   return (
-    <div>
-      <h2>login to application</h2>
-
+    <>
       <Togglable buttonLabel='Login to application' ref={loginFormRef}>
         <form onSubmit={submit}>
           <div>
@@ -43,7 +41,7 @@ const LoginForm = () => {
           <button id='login'>login</button>
         </form>
       </Togglable>
-    </div>
+    </>
   )
 }
 export default LoginForm
