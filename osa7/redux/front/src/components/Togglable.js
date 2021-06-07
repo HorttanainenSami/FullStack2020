@@ -1,34 +1,32 @@
-import React, { useState, useImperativeHandle } from 'react'
-
+import React, { useImperativeHandle, useState } from 'react'
+import { Accordion, Typography, AccordionSummary, AccordionDetails } from '@material-ui/core'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+  
 const Togglable = React.forwardRef((props, ref) => {
-  const [visible, setVisible] = useState(false)
-
-  const hideWhenVisible = { display: visible ? 'none' : '' }
-  const showWhenVisible = { display: visible ? '' : 'none' }
-
+  const [visibility, setVisibility] = useState(false)
   const toggleVisibility = () => {
-    setVisible(!visible)
-  }
-
+    setVisibility(!visibility)
+   }
   useImperativeHandle(ref, () => {
-    return {
+    return{
       toggleVisibility
     }
   })
-
   return (
     <div>
-      <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
-      </div>
-      <div style={showWhenVisible} className="togglableContent">
-        {props.children}
-        <button onClick={toggleVisibility}>cancel</button>
-      </div>
+      <Accordion expanded={visibility} onChange={toggleVisibility}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls='panel1a-content' id='panel1a-header'>
+        <Typography variant='h5' gutterBottom>{props.buttonLabel} </Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <div>
+          {props.children}
+        </div>
+      </AccordionDetails>
+      </Accordion>
     </div>
   )
 })
-
-Togglable.displayName = 'Togglable'
+Togglable.displayName='Togglable'
 
 export default Togglable

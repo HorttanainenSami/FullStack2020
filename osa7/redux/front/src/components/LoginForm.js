@@ -1,6 +1,7 @@
 import React from 'react'
 import useField from '../hooks/index'
 import Togglable from './Togglable'
+import { TextField, Button } from '@material-ui/core'
 import { useDispatch } from 'react-redux'
 import { setNotification } from '../reducers/notification'
 import { loginUser } from '../reducers/login'
@@ -31,14 +32,12 @@ const LoginForm = () => {
       <Togglable buttonLabel='Login to application' ref={loginFormRef}>
         <form onSubmit={submit}>
           <div>
-            username
-            <input {...username} />
+            <TextField label='usernamme' {...username} />
           </div>
           <div>
-            password
-            <input {...password} />
+            <TextField label='password' {...password} />
           </div>
-          <button id='login'>login</button>
+          <Button variant ='outlined' type='submit' id='login'>login</Button>
         </form>
       </Togglable>
     </>

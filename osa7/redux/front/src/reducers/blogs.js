@@ -10,21 +10,30 @@ export const initializeBlogs = () => {
   }
 }
 export const updateBlog = (blog) => {
-  return {
-    type: 'UPDATE_BLOG',
-    data: blog
+  return async dispatch => {
+    const updatedBlog = await blogService.update(blog)
+    await dispatch({
+      type: 'UPDATE_BLOG',
+      data: updatedBlog
+    })
   }
 }
 export const createBlog = (blog) => {
-  return  {
+  return async dispatch => {
+    const newBlog = await blogService.create(blog)
+    await dispatch({ 
     type: 'NEW_BLOG',
-    data: blog
+    data: newBlog
+    })
   }
 }
 export const removeBlog = (id) => {
-  return {
-    type: 'REMOVE_BLOG',
-    data: id
+  return async dispatch => {
+    await blogService.remove(id)
+    await dispatch({
+      type: 'REMOVE_BLOG',
+      data: id
+    })
   }
 }
 export const commentBlog = (id, message) => {
@@ -39,7 +48,7 @@ export const commentBlog = (id, message) => {
 const blogReducer = (state=[], action) => {
   switch(action.type) {
     case 'UPDATE_BLOG':
-      return state.map(blog => blog.id === action.data.id ? action.data:blog)
+      return state.map(blog => blog.id === action.data.id ? action.data : blog)
     case 'INITIALIZE_BLOGS':
       return action.data
     case 'NEW_BLOG':

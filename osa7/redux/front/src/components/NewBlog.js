@@ -1,9 +1,9 @@
 import React from 'react'
 import useField from '../hooks/index'
-import blogService from '../services/blogs'
 import { useDispatch } from 'react-redux'
 import { createBlog } from '../reducers/blogs'
 import { setNotification } from '../reducers/notification'
+import { TextField, Button } from '@material-ui/core'
 import Togglable from './Togglable'
 
 const NewBlog = (props) => {
@@ -23,10 +23,9 @@ const NewBlog = (props) => {
     })
 
     try {
-      const newBlog = await blogService.create(blog)
+      dispatch(createBlog(blog))
       blogFormRef.current.toggleVisibility()
-      dispatch(createBlog(newBlog))
-      dispatch(setNotification(`a new blog '${newBlog.title}' by ${newBlog.author} added!`))
+      dispatch(setNotification(`a new blog '${blog.title}' by ${blog.author} added!`))
     } catch(exception) {
       dispatch(setNotification(exception.message, 'error'))
     }
@@ -35,23 +34,19 @@ const NewBlog = (props) => {
     setUrl('')
   }
   return (
-    <div>
+    <div style={{marginTop: 10, marginBottom: 10}}>
       <Togglable buttonLabel='create new blog' ref={blogFormRef}>
-        <h2>create new</h2>
         <form onSubmit={handleNewBlog}>
           <div>
-            author
-            <input {...author} />
+            <TextField label='author' {...author} />
           </div>
           <div>
-            title
-            <input {...title} />
+            <TextField label='title' {...title} />
           </div>
           <div>
-            url
-            <input {...url}/>
+            <TextField label='url' {...url}/>
           </div>
-          <button id="create">create</button>
+          <Button variant='outlined' id="create" type='submit'>create</Button>
         </form>
       </Togglable>
     </div>
