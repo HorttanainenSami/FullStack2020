@@ -1,12 +1,26 @@
-
-import React from 'react'
-
+import { useLazyQuery, gql } from '@apollo/client'
+import React, { useState, useEffect } from 'react'
+const query = gql`
+  query {
+    allBooks{title,author,published}
+  }
+`
 const Books = (props) => {
+  const [books, setBooks] = useState([])
+  const [getBooks, result] = useLazyQuery(query)
+
+  useEffect(() => {
+    getBooks()
+  }, [])
+  useEffect(() => {
+    if (result.data) {
+      setBooks(result.data.allBooks)
+    }
+  },[result])
+
   if (!props.show) {
     return null
   }
-
-  const books = []
 
   return (
     <div>
