@@ -16,11 +16,21 @@ export const ALL_BOOKS = gql`
   }
 `
 export const ALL_AUTHORS = gql`
-    query {
-      allAuthors{
-        name,
-        born,
-        bookCount
-      }
+  query {
+    allAuthors{
+      name,
+      born,
+      bookCount
     }
+  }
+`
+export const SET_BIRTHYEAR = gql`
+  mutation setBirthYear($author: String!, $birthYear: Int!){
+    editAuthor(name: $author, setBornTo: $birthYear){
+      name,
+      id,
+      born,
+      bookCount
+    }
+  }
 `
