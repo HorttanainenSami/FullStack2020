@@ -1,18 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { gql, useLazyQuery } from '@apollo/client'
+import { ALL_AUTHORS } from '../queries'
 
-const query = gql`
-    query {
-      allAuthors{
-        name,
-        born,
-        bookCount
-      }
-    }
-`
 const Authors = (props) => {
   const [authors, setAuthor] = useState([]) 
-  const [getAuthors, result] = useLazyQuery(query)
+  const [getAuthors, result] = useLazyQuery(ALL_AUTHORS)
   useEffect(() => {
     getAuthors()
   },[])
