@@ -12,7 +12,7 @@ export const CREATE_BOOK = gql`
 `
 export const ALL_BOOKS = gql`
   query {
-    allBooks{title,author,published,id}
+    allBooks{title,author{name, id},published,id}
   }
 `
 export const ALL_AUTHORS = gql`

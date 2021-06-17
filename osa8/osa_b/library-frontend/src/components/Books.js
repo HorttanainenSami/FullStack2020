@@ -1,4 +1,4 @@
-import { useLazyQuery, gql } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import React, { useState, useEffect } from 'react'
 import { ALL_BOOKS } from '../queries'
 const Books = (props) => {
@@ -36,7 +36,7 @@ const Books = (props) => {
           {books.map(a =>
             <tr key={a.id}>
               <td>{a.title}</td>
-              <td>{a.author}</td>
+              <td>{a.author.name}</td>
               <td>{a.published}</td>
             </tr>
           )}
