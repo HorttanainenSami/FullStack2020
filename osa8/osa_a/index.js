@@ -110,6 +110,7 @@ const resolvers = {
   Mutation: {
     addBook:async (root, args, context) => {
       if(!context || !context.currentUser) {
+        console.log('not connected')
         return null
       }
       const authors = await Author.find({})
@@ -121,6 +122,7 @@ const resolvers = {
         try{
           author = await newAuthor.save() 
         }catch(error){
+          console.log('auth error')
           throw new UserInputError(error.message, {
             invalidArgs: args,
           })
@@ -130,8 +132,10 @@ const resolvers = {
         const book = new Book({ ...args, author: author._id })
         let savedBook = await book.save()
         savedBook = await savedBook.populate('author').execPopulate()
+        console.log(savedBook)
         return savedBook
       }catch(error){
+        console.log('error')
         throw new UserInputError(error.message,{
           invalidArgs: args,
         })
@@ -148,9 +152,15 @@ const resolvers = {
       return Author.findByIdAndUpdate(matching._id, {born: args.setBornTo}, {new:true}) 
     },
     createUser: async (root, args) => {
-      const newUser = new User({ username: args.username, favoriteGenre: args.favoriteGenre })
-      const savedUser = await newUser.save()
-      return savedUser
+      try{
+        const newUser = new User({ username: args.username, favoriteGenre: args.favoriteGenre })
+        const savedUser = await newUser.save()
+        return savedUser
+      }catch(error){
+        throw new UserInputError(error.message,{
+          invalidArgs: args,
+        })
+      }
     },
     login: async (root, args) => {
       const user = await User.findOne({username: args.username})
