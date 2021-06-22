@@ -92,7 +92,7 @@ const resolvers = {
       }
     },
     allAuthors:() => Author.find({}),
-    me: (context) => context.currentUser
+    me: (root, args, context) => context.currentUser
   },
   Book: {
     genres: (root) => {
@@ -189,6 +189,7 @@ const server = new ApolloServer({
       const currentUser = await User.findById(decodedToken.id)
       return { currentUser }
     }
+    return null
   }
 })
 

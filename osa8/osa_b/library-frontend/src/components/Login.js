@@ -7,18 +7,19 @@ const LoginForm = ({ show, setError, setToken}) => {
   const [password, setPassword] = useState('')
   const [ login, result ] = useMutation(LOGIN,{
   onError: (error) => {
-    console.log('login error')
     setError(error.message) 
 }})
   useEffect(() => {
-    console.log(result.data)
      if(result.data && result.data.login === null){
       setError('Wrong credentials')
     }
   },[result.data])
   useEffect(() => {
     if(result.data && result.data.login){
-      setToken(result.data.login.value)
+      setToken(result.data.login.value, username)
+      console.log(username)
+      setUsername('')
+      setPassword('')
     }
   },[result.data]) 
   if (!show) {
@@ -27,8 +28,6 @@ const LoginForm = ({ show, setError, setToken}) => {
   const submit = (event) => {
     event.preventDefault()
     login({variables: {username, password}})
-    setUsername('')
-    setPassword('')
   }
   return (
     <div>

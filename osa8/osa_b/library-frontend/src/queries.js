@@ -11,8 +11,17 @@ export const CREATE_BOOK = gql`
 }
 `
 export const ALL_BOOKS = gql`
-  query {
-    allBooks{title,author{name, id},published,id, genres}
+  query($author:String, $genre: String) {
+    allBooks(author:$author, genre:$genre){
+      title,
+      author{
+        name,
+        id
+      },
+      published,
+      id,
+      genres
+    }
   }
 `
 export const ALL_AUTHORS = gql`
@@ -39,5 +48,14 @@ export const LOGIN = gql`
     login(username:$username,password:$password){
       value
       }
+  }
+`
+export const ME = gql`
+  query {
+    me{
+      username,
+      favoriteGenre,
+      id
+    }
   }
 `
