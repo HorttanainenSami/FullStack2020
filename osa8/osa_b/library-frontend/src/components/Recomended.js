@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react'
-import { useLazyQuery } from '@apollo/client'
-import { ALL_BOOKS } from '../queries'
+import React from 'react'
 const Recomended = ({show, books, user}) => {
 
   if(!show){
@@ -26,11 +24,17 @@ const Recomended = ({show, books, user}) => {
     <table>
       <tbody>
         <tr>
-          <td></td>
-          <td><b>author</b></td>
-          <td><b>published </b></td>
+          <th></th>
+          <th><b>author</b></th>
+          <th><b>published </b></th>
         </tr>
-        {booksToShow().map(book => <tr> <td> {book.title} </td> <td> {book.author.name} </td> <td> {book.published} </td> </tr>)}
+        {booksToShow().map(book => (
+          <tr key={book.id}> 
+            <td> {book.title} </td>
+            <td> {book.author.name} </td>
+            <td> {book.published} </td>
+          </tr>
+        ))}
       </tbody>
     </table>
     </>
