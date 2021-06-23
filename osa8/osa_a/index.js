@@ -75,7 +75,10 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    bookCount: () => Book.collection.coutnDocuments(),
+    bookCount: () =>{
+      console.log('book Count')
+      return Book.collection.countDocuments()
+    },
     authorCount: () => Author.collection.countDocuments(),
     allBooks:async (root, args) => {
       try{
@@ -95,7 +98,10 @@ const resolvers = {
         console.log(e)
       }
     },
-    allAuthors:() => Author.find({}),
+    allAuthors:() =>{
+      console.log('resolver: allAuthors')
+      return Author.find({}) 
+    },
     me: (root, args, context) => context.currentUser
   },
   Book: {
@@ -103,12 +109,9 @@ const resolvers = {
       return root.genres
     }
   },
-  Author: {
-    bookCount:async (root) => {
-      const count = await Book.find({author : root.id})
-      return (
-        count.length
-      )
+  Author : {
+    bookCount: (root) => {
+      return root.books.length
     }
   },
   Mutation: {
@@ -122,6 +125,7 @@ const resolvers = {
       if (!author) {
         const newAuthor = new Author({
           name: args.author,
+          books:[],
         })
         try{
           author = await newAuthor.save() 
@@ -135,6 +139,8 @@ const resolvers = {
       try{
         const book = new Book({ ...args, author: author._id })
         let savedBook = await book.save()
+        console.log(savedBook)
+        await Author.findByIdAndUpdate({ _id: author.id},{ books: author.books.concat(savedBook._id)})
         savedBook = await savedBook.populate('author').execPopulate()
         pubsub.publish('BOOK_ADDED', { bookAdded: savedBook })
         console.log(savedBook)
@@ -158,6 +164,7 @@ const resolvers = {
     },
     createUser: async (root, args) => {
       try{
+        console.log('resolver: create user')
         const newUser = new User({ username: args.username, favoriteGenre: args.favoriteGenre })
         const savedUser = await newUser.save()
         return savedUser
@@ -180,7 +187,6 @@ const resolvers = {
       }
       return null
     }
-
   },
   Subscription: {
     bookAdded: {
