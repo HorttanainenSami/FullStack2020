@@ -24,22 +24,42 @@ const App = () => {
       loggedUser()
     }
   }, [])
+  const updateCacheWith = (addedPerson) => {
+    const dataInStore = client.readQuery({ query: ALL_BOOKS })
+    const includedIn = (set, object) => {
+      const a = set.filter(book => book.id === object.id)
+      return a.length !== 0 
+    }
+    console.log(dataInStore)
+    console.log(addedPerson)
+    console.log(includedIn(dataInStore.allBooks, addedPerson))
+    if(!includedIn(dataInStore.allBooks, addedPerson)) {
+      client.writeQuery({
+        query: ALL_BOOKS,
+        data: { allBooks: dataInStore.allBooks.concat(addedPerson)}
+      })
+    }
+  }
   useSubscription(BOOK_ADDED, {
     onSubscriptionData: ({ subscriptionData }) => {
-      console.log(`subscription happened ${subscriptionData}`)
       window.alert(`new book is added `)
+      const addedPerson = subscriptionData.data.bookAdded
+      updateCacheWith(addedPerson)
     }
   })
+
   useEffect(() => {
     if(result.data){
       setUser(result.data.me) 
     }
   },[result])
+
   useEffect(() => {
     if(user){
       getBooks({ variables: {genre: user.favoriteGenre}}) 
     }
   }, [user])
+
   useEffect(() => {
     if(bookResult.data){
       console.log(bookResult.data.allBooks)
