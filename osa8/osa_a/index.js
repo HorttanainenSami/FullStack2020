@@ -1,4 +1,4 @@
-const { ApolloServer, gql, UserInputError } = require('apollo-server')
+const { ApolloServer, gql, UserInputError, PubSub } = require('apollo-server')
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 require('dotenv').config()
@@ -6,6 +6,7 @@ const Author = require('./models/Author')
 const Book = require('./models/Book')
 const User = require('./models/User')
 
+const pubsub = new PubSub()
 console.log('connecting to Atlas DB')
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
@@ -66,6 +67,9 @@ const typeDefs = gql`
       username: String!
       password: String!
     ): Token
+  },
+  type Subscription {
+    bookAdded: Book!
   }
 `
 
@@ -132,6 +136,7 @@ const resolvers = {
         const book = new Book({ ...args, author: author._id })
         let savedBook = await book.save()
         savedBook = await savedBook.populate('author').execPopulate()
+        pubsub.publish('BOOK_ADDED', { bookAdded: savedBook })
         console.log(savedBook)
         return savedBook
       }catch(error){
@@ -176,6 +181,11 @@ const resolvers = {
       return null
     }
 
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator(['BOOK_ADDED'])
+    }
   }
 }
 
@@ -193,6 +203,7 @@ const server = new ApolloServer({
   }
 })
 
-server.listen().then(({ url }) => {
+server.listen().then(({ url, subscribtionsUrl }) => {
   console.log(`Server ready at ${url}`)
+  console.log(`Subscriptions at ${subscribtionsUrl}`)
 })
