@@ -1,5 +1,20 @@
 // bmi = 1.3 * mass(kg)/(height(m)^2.5)
+interface params {
+  mass: number,
+  height: number,
+}
+const parseArgs = (args: Array<String>): params => {
+  if(args.length < 4) throw new Error('too few args')
+  if(args.length > 4) throw new Error('too many args')
 
+  const [a, b, mass, height ] = args.map(Number) 
+  if(!isNaN(mass) && !isNaN(Number(height))){
+    return {
+      mass,
+      height
+    }
+  }
+}
 const bmiCalculator = (mass: number, height: number) => {
   const a = Math.pow(height,2.5)
   const b = mass/a
@@ -22,7 +37,11 @@ const bmiCalculator = (mass: number, height: number) => {
     case (bmi < 15) :
       return 'very severely underweight' 
   }
-  return bmi
 }
-console.log(bmiCalculator(67, 1.89))
 
+try{
+  const {mass, height} = parseArgs(process.argv)
+  console.log(bmiCalculator(mass, height))
+}catch(e){
+  console.log('error', e)
+}

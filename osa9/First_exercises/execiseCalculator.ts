@@ -7,8 +7,21 @@ interface Result {
   target: number;
   average: number;
 }
+interface inputValues {
+  array: Array<number>;
+  target: number;
+}
+const parseArguments = (args: Array<string>): inputValues => {
+  if( args.length < 4){
+    throw new Error('wrong amounth of args')
+  }
+  const [a, b, target, ...array ] = args.map(Number)
+  return{
+    array,
+    target
+  }
+}
 const getRating = (precentage:number):number => {
-  console.log(`rating ${precentage}`)
   switch(true){
     case(precentage>=1):
       return 3
@@ -45,4 +58,9 @@ const calculateExercises = (week:Array<number>, target: number): Result => {
     average
   }
 }
-console.log(calculateExercises([3,0,2,0,0,3,1], 5))
+try {
+  const { array, target } = parseArguments(process.argv)
+  console.log(calculateExercises(array, target))
+}catch(e) {
+  console.log('Error', e.message)
+}
