@@ -7,16 +7,17 @@ const parseArgs = (args: Array<String>): params => {
   if(args.length < 4) throw new Error('too few args')
   if(args.length > 4) throw new Error('too many args')
 
-  const [a, b, mass, height ] = args.map(Number) 
+  const [_a, _b, mass, height ] = args.map(Number) 
   if(!isNaN(mass) && !isNaN(Number(height))){
     return {
       mass,
       height
     }
-  }
+  } throw new Error('types of args were wrong')
+
 }
-const bmiCalculator = (mass: number, height: number) => {
-  const a = Math.pow(height,2.5)
+export const bmiCalculator = (mass: number, height: number):String => {
+  const a = Math.pow(height/100,2.5)
   const b = mass/a
   const bmi = 1.3 * b
   switch(true){
@@ -36,6 +37,8 @@ const bmiCalculator = (mass: number, height: number) => {
       return 'Severely underweight' 
     case (bmi < 15) :
       return 'very severely underweight' 
+    default:
+      throw new Error('something went wront')
   }
 }
 
