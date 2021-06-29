@@ -3,48 +3,47 @@ interface params {
   mass: number,
   height: number,
 }
-const parseArgs = (args: Array<String>): params => {
-  if(args.length < 4) throw new Error('too few args')
-  if(args.length > 4) throw new Error('too many args')
+const parseArgs = (args: Array<string>): params => {
+  if(args.length < 4) throw new Error('too few args');
+  if(args.length > 4) throw new Error('too many args');
 
-  const [_a, _b, mass, height ] = args.map(Number) 
+  const [_a, _b, mass, height ] = args.map(Number) ;
   if(!isNaN(mass) && !isNaN(Number(height))){
     return {
       mass,
       height
-    }
-  } throw new Error('types of args were wrong')
-
-}
-export const bmiCalculator = (mass: number, height: number):String => {
-  const a = Math.pow(height/100,2.5)
-  const b = mass/a
-  const bmi = 1.3 * b
+    };
+  } throw new Error('types of args were wrong');
+};
+export const bmiCalculator = (mass: number, height: number):string => {
+  const a = Math.pow(height/100,2.5);
+  const b = mass/a;
+  const bmi = 1.3 * b;
   switch(true){
     case(bmi>=40):
-      return 'Obese Class III (very severely obese)'
+      return 'Obese Class III (very severely obese)';
     case(bmi>=35):
-      return 'Obese Class II (severely obese)'
+      return 'Obese Class II (severely obese)';
     case(bmi>=30):
-      return 'Obese Class I (moderately obese)'
+      return 'Obese Class I (moderately obese)';
     case(bmi>=25):
-      return 'Overweight'
+      return 'Overweight';
     case(bmi>=18.5):
-      return 'Normal (healthy weight)'
+      return 'Normal (healthy weight)';
     case (bmi >= 16) :
-      return 'underweight' 
+      return 'underweight' ;
     case (bmi >= 15) :
-      return 'Severely underweight' 
+      return 'Severely underweight' ;
     case (bmi < 15) :
-      return 'very severely underweight' 
+      return 'very severely underweight' ;
     default:
-      throw new Error('something went wront')
+      throw new Error('something went wrong');
   }
-}
+};
 
 try{
-  const {mass, height} = parseArgs(process.argv)
-  console.log(bmiCalculator(mass, height))
+  const {mass, height} = parseArgs(process.argv);
+  console.log(bmiCalculator(mass, height));
 }catch(e){
-  console.log('error', e)
+  console.log('error', e);
 }
