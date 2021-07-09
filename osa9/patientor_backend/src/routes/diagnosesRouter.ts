@@ -1,5 +1,5 @@
 import express from 'express';
-import { data } from '../services/diagnosisSevice';
+import { data } from '../services/diagnosesService';
 const diagnoseRouter = express.Router();
 
 
