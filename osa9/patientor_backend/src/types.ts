@@ -3,12 +3,23 @@
   name: string,
   latin?: string,
 }
-type gender = 'male' | 'female';
-export interface Patients {
+export enum Gender { 
+  'male',
+  'female',
+}
+export interface Patient {
   id: string,
   name: string,
   dateOfBirth: string,
   ssn: string,
-  gender: gender,
+  gender: Gender,
   occupation: string,
 }
+export type NewPatient = Omit<Patient, 'id'>;
+export type Fields = { 
+  name: unknown,
+  dateOfBirth: unknown,
+  ssn: unknown,
+  gender: unknown,
+  occupation: unknown,
+};
