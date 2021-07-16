@@ -1,10 +1,13 @@
-import { NewPatient, Gender, Fields } from './types';
+import { NewPatient, Gender, Fields, Entry } from './types';
 const isString = (entry: unknown): entry is string => {
   return typeof entry === 'string' || entry instanceof String;
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isGender = (param: any): param is Gender => {
   return Object.values(Gender).includes(param);
+};
+const isArray = (param: any): param is Entry[] => {
+  return typeof param[0] === 'string' || param instanceof Array;
 };
 
 const parseName = (name: unknown): string => {
@@ -39,13 +42,21 @@ const parseGender = (entry: unknown): Gender => {
   return entry;
 };
 
-export const toNewPatientEntry = ({name, dateOfBirth, ssn, occupation, gender} : Fields): NewPatient => {
+const parseEntries = (entry: unknown): Entry[] => {
+  if(!entry || !isArray(entry)) {
+    throw new Error('entry is incorrect or deosnt exist');
+  }
+  return entry;
+};
+
+export const toNewPatientEntry = ({name, dateOfBirth, ssn, occupation, gender, entries} : Fields): NewPatient => {
   const newPatient = {
     name: parseName(name),
     dateOfBirth : parseDateOfBirth(dateOfBirth),
     ssn : parseSsn(ssn),
     occupation : parseOccupation(occupation),
     gender : parseGender(gender),
+    entries: parseEntries(entries),
   }; 
   return newPatient;
 };

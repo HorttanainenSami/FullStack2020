@@ -16,7 +16,14 @@ router.post('/', (req, res) => {
   }catch(e){
     res.status(400).send(e.message);
   }
-
+});
+router.get('/:id', (req, res) => {
+  const id = req.params.id;
+  const patient = patientsData().find(patient => patient.id === id);
+  if(patient){
+    return res.send(patient);
+  }
+  return res.status(400).send({error: 'no patient with such id'});
 });
 
 export default router;
