@@ -1,14 +1,50 @@
 import React, { useEffect, useState } from 'react';
 import { apiBaseUrl } from '../constants';
 import axios from 'axios';
-import { Patient, Gender } from '../types';
+import { Patient, Gender, Entry } from '../types';
 import { useParams } from 'react-router-dom';
+const EntryComponent = (props: Entry) => {
+  switch(props.type){
+  case 'OccupationalHealthcare':
+    return(
+      <div className='ui small header'>
+        <i> {props.date} {props.description} </i>    
+        <ul>
+          {props.diagnosisCodes?.map(code => <li key={code}> {code} </li>)}
+        </ul>
+     
+      </div>
+    );
+    case 'Hospital':
+      return(
+        <div className='ui small header'>
+          <i> {props.date} {props.description} </i>    
+          <ul>
+            {props.diagnosisCodes.map(code => <li key={code}> {code} </li>)}
+          </ul>
+        </div>
+      );
+
+    case 'HealthCheck':
+      return(
+        <>
+          <i> {props.date} {props.description} </i>    
+          <div> 
+            Health check rating: {props.healthChechRating}
+          </div>
+        </>
+      );
+    default:
+      return<> </>;
+  }
+};
 const PatientPage = (): JSX.Element => {
   const [patient, setPatient] = useState<Patient>( {
       id: 'undefined',
       name: '-',
       occupation: '-',
       gender: Gender.Other,
+      entries: []
     });
   const { id } = useParams<{id: string}> ();
   useEffect( () => {
@@ -33,17 +69,22 @@ console.log(patient);
   }
   return( 
     <div>
-      <h1 className='ui header'>
+      <div className='ui huge header'>
         {patient?.name}
         <i className= {GenderIcon()}></i>
-      </h1>
+      </div>
       <div className='ui small header' > 
         ssn: {patient.ssn}
       </div>
       <div className='ui small header' > 
         occupation: {patient.occupation}
       </div>
+    <div className='ui medium header'>
+    Entries
     </div>
+      {patient.entries.map(a => <EntryComponent key={a.id} {...a} />)}
+    </div>
+
   );
 };
 export default PatientPage;
