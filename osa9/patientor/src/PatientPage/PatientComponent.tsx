@@ -27,6 +27,7 @@ const GenderIcon = () => {
       return "";
   }
 };
+console.log(patient);
   if(!patient){
     return <p> asd </p>;
   }

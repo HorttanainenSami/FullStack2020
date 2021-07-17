@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 import { Link } from 'react-router-dom';
 import { Container, Table, Button } from "semantic-ui-react";
-
+import { createPatient } from '../state/reducer';
 import { PatientFormValues } from "../AddPatientModal/AddPatientForm";
 import AddPatientModal from "../AddPatientModal";
 import { Patient } from "../types";
@@ -29,7 +29,7 @@ const PatientListPage = () => {
         `${apiBaseUrl}/patients`,
         values
       );
-      dispatch({ type: "ADD_PATIENT", payload: newPatient });
+      dispatch(createPatient(newPatient));
       closeModal();
     } catch (e) {
       console.error(e.response?.data || 'Unknown Error');
