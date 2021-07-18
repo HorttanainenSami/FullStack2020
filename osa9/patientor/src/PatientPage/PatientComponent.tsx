@@ -1,43 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { apiBaseUrl } from '../constants';
 import axios from 'axios';
-import { Patient, Gender, Entry } from '../types';
+import { Patient, Gender } from '../types';
 import { useParams } from 'react-router-dom';
-const EntryComponent = (props: Entry) => {
-  switch(props.type){
-  case 'OccupationalHealthcare':
-    return(
-      <div className='ui small header'>
-        <i> {props.date} {props.description} </i>    
-        <ul>
-          {props.diagnosisCodes?.map(code => <li key={code}> {code} </li>)}
-        </ul>
-     
-      </div>
-    );
-    case 'Hospital':
-      return(
-        <div className='ui small header'>
-          <i> {props.date} {props.description} </i>    
-          <ul>
-            {props.diagnosisCodes.map(code => <li key={code}> {code} </li>)}
-          </ul>
-        </div>
-      );
-
-    case 'HealthCheck':
-      return(
-        <>
-          <i> {props.date} {props.description} </i>    
-          <div> 
-            Health check rating: {props.healthChechRating}
-          </div>
-        </>
-      );
-    default:
-      return<> </>;
-  }
-};
+import EntryComponent from '../components/EntryComponent';
 const PatientPage = (): JSX.Element => {
   const [patient, setPatient] = useState<Patient>( {
       id: 'undefined',
@@ -63,7 +29,6 @@ const GenderIcon = () => {
       return "";
   }
 };
-console.log(patient);
   if(!patient){
     return <p> asd </p>;
   }
