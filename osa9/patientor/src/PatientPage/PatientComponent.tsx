@@ -44,10 +44,12 @@ const GenderIcon = () => {
       <div className='ui small header' > 
         occupation: {patient.occupation}
       </div>
-    <div className='ui medium header'>
-    Entries
-    </div>
-      {patient.entries.map(a => <EntryComponent key={a.id} {...a} />)}
+      <div className='ui medium header'>
+      Entries
+      </div>
+      <div className='ui cards'> 
+        {patient.entries.map(a => <EntryComponent key={a.id} {...a} />)}
+      </div>
     </div>
 
   );

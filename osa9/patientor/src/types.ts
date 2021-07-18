@@ -39,7 +39,7 @@ interface OccupationalHealthcare extends baseEntry {
 }
 interface HealthCheck extends baseEntry {
   type: 'HealthCheck',
-  healthChechRating: HealthCheckRating,
+  healthCheckRating: HealthCheckRating,
 }
 interface Hospital extends baseEntry {
   type: 'Hospital',

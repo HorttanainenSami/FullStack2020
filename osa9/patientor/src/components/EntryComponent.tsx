@@ -31,34 +31,62 @@ const EntryComponent = (props: Entry) => {
   switch(props.type){
   case 'OccupationalHealthcare':
     return(
-      <div className='ui small header'>
-        <i> {props.date} {props.description} </i>    
-        <ul>
-          {diagnoses?.map(code => <li key={code}> {code} </li>)}
-        </ul>
+      <div className='card'>
+        <div className='ui small header'>
+          <i> {props.date} <i className="user md icon"></i> </i>    
+            <div className='meta'>
+              {props.description}    
+            </div>
+          <ul>
+            {diagnoses?.map(code => <li key={code}> {code} </li>)}
+          </ul>
+        </div>
       </div>
     );
     case 'Hospital':
       return(
+      <div className='card'>
         <div className='ui small header'>
-          <i> {props.date} {props.description} </i>    
+        <i> {props.date} <i className="user md icon"></i> </i>    
+            <div className='meta'>
+              {props.description}    
+            </div>
           <ul>
             {diagnoses?.map(code => <li key={code}> {code} </li>)}
           </ul>
+        </div>
         </div>
       );
 
     case 'HealthCheck':
       return(
-        <>
-          <i> {props.date} {props.description} </i>    
-          <div> 
-            Health check rating: {props.healthChechRating}
-          </div>
-        </>
+        <div className='card'>
+        <div className='ui small header'>
+          <i> {props.date} <i className="user md icon"></i> </i>    
+            <div className='meta'>
+              {props.description}    
+            </div>
+            </div>
+              <i className={`${selectHealthCondition(props.healthCheckRating)} heart icon`}></i>
+        </div>
       );
     default:
       return<> </>;
+  }
+};
+const selectHealthCondition = (rating: number) => {
+  switch(rating){
+    case 0:
+      return "green";
+    case 1:
+      return "yellow";
+    case 2:
+      return "orange";
+    case 3:
+      return "red";
+    default:
+      return "black";
+    
   }
 };
 export default EntryComponent;
