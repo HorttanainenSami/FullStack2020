@@ -32,6 +32,29 @@ export interface DataFields extends Fields {
   id: unknown,
 }
 //Entry
+
+export type EntryFields = OccupationalHealthcareField | HealthCheckField | HospitalField; 
+
+interface baseEntryField {
+  date: unknown,
+  specialist: unknown,
+  description: unknown,
+}
+interface OccupationalHealthcareField extends baseEntryField{
+  type: 'OccupationalHealthcare',
+  diagnosisCodes?: unknown,
+  employerName: unknown,
+  sickLeave?: unknown,
+}
+interface HealthCheckField extends baseEntry{
+  type: 'HealthCheck',
+  healthCheckRating: unknown,
+}
+interface HospitalField extends baseEntry{
+  type: 'Hospital',
+  diagnosisCodes: unknown,
+  discharge: unknown,
+}
 export enum HealthCheckRating {
   "Healthy" = 0,
   "LowRisk" = 1,
@@ -39,11 +62,11 @@ export enum HealthCheckRating {
   "CriticalRisk" = 3
 }
 
-interface SickLeave{
+export interface SickLeave{
   startDate: string,
   endDate: string,
 }
-interface Discharge{
+export interface Discharge{
   date: string,
   criteria: string,
 }
@@ -53,9 +76,10 @@ interface baseEntry {
   specialist: string,
   description: string,
 }
+export type DiagnosisCodes = Array<Diagnosis['code']>;
 interface OccupationalHealthcare extends baseEntry {
   type: 'OccupationalHealthcare',
-  diagnosisCodes?: Array<Diagnosis['code']>,
+  diagnosisCodes?: DiagnosisCodes,
   employerName: string,
   sickLeave?: SickLeave,
 }
@@ -65,8 +89,10 @@ interface HealthCheck extends baseEntry{
 }
 interface Hospital extends baseEntry{
   type: 'Hospital',
-  diagnosisCodes: Array<Diagnosis['code']>,
+  diagnosisCodes: DiagnosisCodes,
   discharge: Discharge,
 }
+type UnionOmit<T, K extends string | number | symbol> = T extends unknown ? Omit<T, K> : never;
+export type EntryWithoutId = UnionOmit<Entry, 'id'>;
 export type Entry = OccupationalHealthcare | HealthCheck | Hospital;
 export type PublicPatient = Omit<Patient, 'ssn' | 'entries' >;

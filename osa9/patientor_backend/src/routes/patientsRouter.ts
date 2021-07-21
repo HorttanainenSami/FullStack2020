@@ -1,12 +1,22 @@
 import express from 'express';
-import { patientsData, addPatient } from '../services/patientsService';
-import { toNewPatientEntry } from '../utils';
+import { patientsData, addPatient, addEntry, getPatient } from '../services/patientsService';
+import { toNewPatientEntry, toNewEntry } from '../utils';
 const router = express.Router();
 
 router.get('/', (_req, res) => {
   res.send(patientsData());
 });
-
+router.post('/:id/entries', (req, res) => {
+  const id = req.params.id;
+  try {
+    const body = toNewEntry(req.body);
+    const patient = getPatient(id);
+    const newEntry = addEntry(body, patient);
+    res.send(newEntry);
+  }catch(e){
+    res.json(e.message);
+  }
+});
 router.post('/', (req, res) => {
   try{
     console.log('asd');
