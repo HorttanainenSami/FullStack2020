@@ -19,15 +19,18 @@ export enum Gender {
   Female= 'female',
   Other= 'other',
 }
-export type NewPatient = Omit<Patient, 'id'>;
+export type NewPatient = Omit<Patient, 'id'|'entries'>;
 export type Fields = { 
   name: unknown,
   dateOfBirth: unknown,
   ssn: unknown,
   gender: unknown,
   occupation: unknown,
-  entries: unknown
 };
+export interface DataFields extends Fields {
+  entries : unknown,
+  id: unknown,
+}
 //Entry
 export enum HealthCheckRating {
   "Healthy" = 0,
