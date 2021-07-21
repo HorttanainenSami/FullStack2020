@@ -10,7 +10,8 @@ export const addPatient = (entry: NewPatient): Patient => {
   const id = uuid();
   const newPatient: Patient = {
     id,
-    ...entry
+    ...entry,
+    entries: [],
   };
   patients.push(newPatient);
   return newPatient;

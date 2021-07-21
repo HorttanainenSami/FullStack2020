@@ -1,4 +1,4 @@
-import { NewPatient, Gender, Fields, Entry } from './types';
+import { NewPatient, Gender, DataFields, Fields, Entry, Patient } from './types';
 const isString = (entry: unknown): entry is string => {
   return typeof entry === 'string' || entry instanceof String;
 };
@@ -48,15 +48,29 @@ const parseEntries = (entry: unknown): Entry[] => {
   }
   return entry;
 };
+const parseId = (entry: unknown): string => {
+  if(!entry || !isString(entry)) {
+    throw new Error('id is incorrect or doest exist');
+  }
+  return entry;
+};
 
-export const toNewPatientEntry = ({name, dateOfBirth, ssn, occupation, gender, entries} : Fields): NewPatient => {
+export const toNewPatientEntry = ({name, dateOfBirth, ssn, occupation, gender} : Fields): NewPatient => {
   const newPatient = {
     name: parseName(name),
     dateOfBirth : parseDateOfBirth(dateOfBirth),
     ssn : parseSsn(ssn),
     occupation : parseOccupation(occupation),
     gender : parseGender(gender),
-    entries: parseEntries(entries),
   }; 
   return newPatient;
+};
+export const toPatientData = ({name, dateOfBirth, ssn, occupation, gender, entries, id}: DataFields): Patient => {
+  const newPatient = toNewPatientEntry({name, dateOfBirth, ssn, occupation, gender});
+  
+  return {
+    ...newPatient,
+    entries: parseEntries(entries),
+    id: parseId(id),
+  };
 };
