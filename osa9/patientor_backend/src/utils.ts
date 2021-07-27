@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { Discharge, HealthCheckRating, SickLeave, DiagnosisCodes, EntryWithoutId, EntryFields, NewPatient, Gender, DataFields, Fields, Entry, Patient } from './types';
-=======
-import { NewPatient, Gender, DataFields, Fields, Entry, Patient } from './types';
->>>>>>> fix for patietor step4
 const isString = (entry: unknown): entry is string => {
   return typeof entry === 'string' || entry instanceof String;
 };
@@ -77,22 +73,6 @@ const parseDischarge = (entry: unknown) : Discharge => {
   }
   return entry;
 };
-const parseId = (entry: unknown): string => {
-  if(!entry || !isString(entry)) {
-    throw new Error('id is incorrect or doest exist');
-  }
-  return entry;
-};
-
-<<<<<<< HEAD
-
-
-
-
-
-
-=======
->>>>>>> fix for patietor step4
 export const toNewPatientEntry = ({name, dateOfBirth, ssn, occupation, gender} : Fields): NewPatient => {
   const newPatient = {
     name: parseString(name, 'name'),
@@ -109,7 +89,6 @@ export const toPatientData = ({name, dateOfBirth, ssn, occupation, gender, entri
   return {
     ...newPatient,
     entries: parseEntries(entries),
-<<<<<<< HEAD
     id: parseString(id, 'id'),
   };
 };
@@ -146,8 +125,3 @@ export const toNewEntry = (entry : EntryFields): EntryWithoutId => {
 const assertNever = (value: never): never => {
   throw new Error(`unhandled union member ${value}`);
 };
-=======
-    id: parseId(id),
-  };
-};
->>>>>>> fix for patietor step4
