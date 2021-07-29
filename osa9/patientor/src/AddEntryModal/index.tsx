@@ -6,17 +6,17 @@ import { EntryWithoutId } from '../types';
 interface Props {
   modalOpen: boolean;
   onClose: () => void;
-  onSubmit: (values: EntryWithoutId) => void;
+  onSubmit: (entry: EntryWithoutId) => void;
 }
 
-const AddEntryModal = (modalEntrys: Props) => (
+const AddEntryModal = ({modalOpen, onClose, onSubmit}: Props) => (
   <Modal 
-    open={modalEntrys.modalOpen}
-    onClose={modalEntrys.onClose}
-    onSubmit={modalEntrys.onSubmit}
+    open={modalOpen}
+    onClose={onClose}
+    onSubmit={onSubmit}
   >
     <Modal.Content>
-      <EntryForm onSubmit={modalEntrys.onSubmit} onCancel={modalEntrys.onClose} /> 
+      <EntryForm onSubmit={onSubmit} onCancel={onClose} /> 
     </Modal.Content>
   </Modal>
 );

@@ -1,162 +1,114 @@
 import React from 'react';
-import { Field, Form, Formik} from 'formik';
-import { Grid, Button } from 'semantic-ui-react';
+import { Formik, Field  } from 'formik';
 import { EntryWithoutId } from '../types';
-import { ArrayField, TypeOption, SelectField, TextField } from './FormField';
-
-const assertNever = (values: never): never => {
-  throw new Error(`unhandled discriminated union member: ${JSON.stringify(values)}`);
-};
-interface Props {
-  onSubmit: (values: EntryWithoutId) => void,
-  onCancel: () => void,
-}
+import { Grid, Button } from 'semantic-ui-react';
+import {NumberField, TextField} from '../AddPatientModal/FormField';
+import { TypeOption, SelectField } from './FormField';
 
 const typeOptions: TypeOption[] = [
   { value: 'OccupationalHealthcare', label: 'OccupationalHealthcare'},
   {value: 'Hospital', label: 'Hospital'}, {value: 'HealthCheck', label: 'HealthCheck'}
 ];
-const OccupationalForm = () => (
-  <>
-    <Field
-      label='Employer name'
-      placeholder='Employer name'
-      name='Name'
-      component={TextField}
+interface Props {
+  onSubmit: (values: EntryWithoutId) => void,
+  onCancel: () => void,
+}
+const HealthCheck = () => (
+  <Field
+    label="healthCheckRating"
+    name="healthCheckRating"
+    component={NumberField}
+    min={0}
+    max={3}
     />
-    <ArrayField name='asd'
-      label='asd'
-     />
-  </>
 );
-const HospitalForm = () => (
-  <div> Hospital </div> 
-);
-const HealthCheckForm = () => (
-  <div> HealthCheck </div> 
-);
-
 const EntryForm = ({onSubmit, onCancel}: Props) => {
-  const [show, setShow] = React.useState<string>('OccupationalHealthcare');
-  const onChange = (entry: any) => {
-    //eslint-disable-next-line
-    const selected = entry.target.options.selectedIndex;
-    //eslint-disable-next-line
-    setShow(typeOptions[selected].label);
+  const [value, setValue] = React.useState(typeOptions[0].value);
+  const onChange = (value:TypeOption['value']) => {
+    setValue(value);
   };
   return(
     <Formik
-      initialValues={{
-          type : 'OccupationalHealthcare', 
-          date: '',
-          specialist:'',
-          description:'',
-          employerName:'',
-          diagnosisCodes:[]||undefined,
-          sickLeave: {startDate:'', endDate:''}||undefined,
-      }||{
-          type: 'Hospital',
-          date: '',
-          specialist:'',
-          description:'',
-          diagnosisCodes:[],
-          discharge: {date:'', criteria:''},
-      }||{
-          type: 'Hospital',
-          date: '',
-          specialist:'',
-          description:'',
-          healthCheckRating:'',
+      initialValues ={{
+        type:'HealthCheck',
+        date:'',
+        specialist:'',
+        description: '',
+        healthCheckRating:5 ,
       }}
       onSubmit={onSubmit}
-      validate={values => {
-        const requiredError = "Field is required";
-        const errors: { [field: string]: string } = {};
-        switch(values.type){
-          case 'OccupationalHealthcare':
-            if(!values.employerName) {
-              errors.employerName = requiredError;
-            }
-            break;
-          case 'Hospital':
-            if(!values.diagnosisCodes){
-              errors.diagnosisCodes = requiredError;
-            }
-            if(!values.discharge){
-              errors.discharge = requiredError;
-            }
-            break;
-          case 'HealthCheck':
-            if(!values.healthCheckRating){
-              errors.healthCheckRating = requiredError;
-            }
-            break;
-          default:
-            assertNever(values);
-        }
-        if (!values.specialist) {
-          errors.specialist = requiredError;
-        }
-        if (!values.date) {
-          errors.date = requiredError;
-        }
-        if (!values.description) {
-          errors.description = requiredError;
-        }
-        return errors;
-      }}
-    >
-      {({ isValid, dirty }) => {
-        return (
-          <Form className="form ui">
-            <Field
-              label='Date'
-              placeholder='MM/DD/YYYY'
-              name='Date'
-              component={TextField}
-            />
-            <Field
-              label='Specilist'
-              placeholder='eg. Dr. House'
-              name='Specialist'
-              component={TextField}
-            />
-            <Field
-              label='Description'
-              placeholder='Describe entry'
-              name='Description'
-              component={TextField}
-            />
-            <SelectField
-              label="Type"
-              options={typeOptions}
-              name="Type"
-              onChange={() =>onChange}
-            />
-
-          { show === 'Hospital' && <HospitalForm />}        
-          { show === 'HealthCheck' && <HealthCheckForm />}
-          { show === 'OccupationalHealthcare' && <OccupationalForm />}
-            <Grid>
-              <Grid.Column floated="left" width={5}>
-                <Button type="button" onClick={onCancel} color="red">
-                  Cancel
-                </Button>
-              </Grid.Column>
-              <Grid.Column floated="right" width={5}>
-                <Button
-                  type="submit"
-                  floated="right"
-                  color="green"
-                  disabled={!dirty || !isValid}
-                >
-                  Add
-                </Button>
-              </Grid.Column>
-            </Grid>
-          </Form>
-        );
-      }}
+    validate = {values => {
+      const requiredError='Field is required';
+      const errors: { [field:string]:string} = {};
+      switch(values.type){
+        case 'OccupationalHealthcare':
+          break;
+        case 'HealthCheck':
+          if( !values.healthCheckRating|| values.healthCheckRating<0|| values.healthCheckRating>3){
+            errors.healthCheckRating = requiredError;
+          }
+          break;
+        case 'Hospital':
+          break;
+      }
+      if(!values.date || values.date.length === 0 || !/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(values.date)){
+        errors.date = requiredError;
+      }
+      if(!values.specialist || values.specialist.length === 0){
+        errors.specialist = requiredError;
+      }
+      if(!values.description || values.description.length === 0){
+        errors.description = requiredError;
+      }
+      return errors;
+    }}
+      >
+    {({ dirty, isValid, handleSubmit }) => (
+      <form onSubmit={handleSubmit}>
+        <SelectField
+          label="type"
+          options={typeOptions}
+          name="type"
+          onChange={onChange}
+        />
+        <Field
+          label="date"
+          name="date"
+          component={TextField}
+          placeholder='YYYY-MM-DD'
+        />
+        <Field
+          label="specialist"
+          name="specialist"
+          component={TextField}
+          placeholder='specialist'
+        />
+        <Field
+          label="description"
+          name="description"
+          component={TextField}
+          placeholder='description'
+        />
+        { value ==='HealthCheck' && <HealthCheck />}
+        <Grid>
+          <Grid.Column floated="left" width={5}>
+            <Button type="button" onClick={onCancel} color="red">
+              Cancel
+            </Button>
+          </Grid.Column>
+          <Grid.Column floated="right" width={5}>
+            <Button
+              type="submit"
+              floated="right"
+              color="green"
+              disabled={!dirty || !isValid}
+            >
+              Add
+            </Button>
+        </Grid.Column>
+      </Grid>
+    </form>
+    )}
     </Formik>
   );
 };

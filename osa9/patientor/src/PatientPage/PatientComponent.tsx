@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { apiBaseUrl } from '../constants';
 import axios from 'axios';
-import { Patient, Gender, EntryWithoutId } from '../types';
+import {Entry, EntryWithoutId, Patient, Gender} from '../types';
 import { useParams } from 'react-router-dom';
 import EntryComponent from '../components/EntryComponent';
 import AddEntryModal from '../AddEntryModal/index';
-
-
+import { useStateValue } from '../state';
+import { createEntry } from '../state/reducer';
 
 const PatientPage = (): JSX.Element => {
   const [modalOpen, setModal] = useState<boolean>(false);
-  const [patient, setPatient] = useState<Patient>( {
+  const [{patients}, dispatch] = useStateValue();
+  const [patient,setPatient] = useState<Patient>( {
       id: 'undefined',
       name: '-',
       occupation: '-',
@@ -19,9 +20,13 @@ const PatientPage = (): JSX.Element => {
     });
   const { id } = useParams<{id: string}> ();
   useEffect( () => {
-    void axios.get<Patient>(`${apiBaseUrl}/patients/${id}`)
-      .then(response => setPatient(response.data));
-  },[id]);
+    for(const a in patients){
+      if(a === id){
+        setPatient(patients[a]);
+        break;
+      }
+    }
+  },[id, patients]);
   const GenderIcon = () => {
     switch(patient.gender){
       case(Gender.Male):
@@ -34,11 +39,15 @@ const PatientPage = (): JSX.Element => {
         return "";
     }
   };
-  const onSubmit = (values: EntryWithoutId): void => {
-    closeModal(); 
-    console.log(values);
+  const onSubmit = async (values: EntryWithoutId): Promise<void> => {
+    try{
+      closeModal(); 
+      const entry = await axios.post<Entry>(`${apiBaseUrl}/patients/${id}/entries`, values);
+      dispatch(createEntry(entry.data, patient, id));
+    } catch (e) {
+      console.log(e);
+    }
   };
-
   const openModal = (): void => setModal(true);
   const closeModal = (): void => setModal(false);
   if(!patient){
@@ -63,7 +72,7 @@ const PatientPage = (): JSX.Element => {
         {patient.entries.map(a => <EntryComponent key={a.id} {...a} />)}
       </div>
       <button onClick={() => openModal()}>Add Entry </button>
-    <AddEntryModal modalOpen={modalOpen} onClose={() => closeModal()} onSubmit={(values) => onSubmit(values)} />
+    <AddEntryModal modalOpen={modalOpen} onClose={closeModal} onSubmit={onSubmit} />
     </div>
 
   );
