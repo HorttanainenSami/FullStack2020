@@ -1,32 +1,9 @@
-import React, { useEffect, useState} from 'react';
-import { Entry, Diagnosis } from '../types';
-import { apiBaseUrl } from '../constants';
-import axios from 'axios';
+import React  from 'react';
+import { Entry } from '../types';
+import {useStateValue} from '../state';
 const EntryComponent = (props: Entry) => {
-  const [diagnoses, setDiagnoses] = useState<Array<string>>([]);
+  const [{ diagnoses }, ] = useStateValue();
 
-  useEffect( () => {
-    //eslint-disable-next-line
-    fetchDiagnoses();
-}, [props.id]);
-
-  const diagnosePromises = async (): Promise<string[]> => {
-    if(props.type === 'HealthCheck' || !props.diagnosisCodes) {
-      return [];
-    }
-    const urls = props.diagnosisCodes.map(code => `${apiBaseUrl}/diagnoses/${code}`);
-    const promises = urls?.map(async url => await axios.get<Diagnosis>(url));
-
-    const asd = await Promise.all(
-      promises.map(promise => promise
-        .then(response =>  `${response.data.code} ${response.data.name}`))
-    );
-    return asd;
-  };
-  const fetchDiagnoses = async () => {
-    const asd = await diagnosePromises();
-    setDiagnoses(asd);
-  };
 
   switch(props.type){
   case 'OccupationalHealthcare':
@@ -38,7 +15,7 @@ const EntryComponent = (props: Entry) => {
               {props.description}    
             </div>
           <ul>
-            {diagnoses?.map(code => <li key={code}> {code} </li>)}
+      {props.diagnosisCodes?.map(diagnosis => <li key={diagnosis}> {diagnoses.find(a => a.code===diagnosis)?.code} {diagnoses.find(a => a.code === diagnosis)?.name} </li>)}
           </ul>
         </div>
       </div>
@@ -52,7 +29,7 @@ const EntryComponent = (props: Entry) => {
               {props.description}    
             </div>
           <ul>
-            {diagnoses?.map(code => <li key={code}> {code} </li>)}
+            {props.diagnosisCodes?.map(diagnosis => <li key={diagnosis}> {diagnoses.find(a => a.code===diagnosis)?.code} {diagnoses.find(a => a.code === diagnosis)?.name} </li>)}
           </ul>
         </div>
         </div>
