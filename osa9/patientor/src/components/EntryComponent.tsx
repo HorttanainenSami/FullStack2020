@@ -9,6 +9,7 @@ const EntryComponent = (props: Entry) => {
   case 'OccupationalHealthcare':
     return(
       <div className='card'>
+      <h3> Occupational Healtcare </h3>
         <div className='ui small header'>
           <i> {props.date} <i className="user md icon"></i> </i>    
             <div className='meta'>
@@ -17,6 +18,8 @@ const EntryComponent = (props: Entry) => {
           <ul>
       {props.diagnosisCodes?.map(diagnosis => <li key={diagnosis}> {diagnoses.find(a => a.code===diagnosis)?.code} {diagnoses.find(a => a.code === diagnosis)?.name} </li>)}
           </ul>
+          <div> employer: {props.employerName} </div>
+      { props.sickLeave ?  <div> Sick leave : {props.sickLeave.startDate} - {props.sickLeave.endDate} </div> :<> </>}
         </div>
       </div>
     );
@@ -31,6 +34,7 @@ const EntryComponent = (props: Entry) => {
           <ul>
             {props.diagnosisCodes?.map(diagnosis => <li key={diagnosis}> {diagnoses.find(a => a.code===diagnosis)?.code} {diagnoses.find(a => a.code === diagnosis)?.name} </li>)}
           </ul>
+        <div> discharge : {props.discharge.date} {props.discharge.criteria} </div>
         </div>
         </div>
       );

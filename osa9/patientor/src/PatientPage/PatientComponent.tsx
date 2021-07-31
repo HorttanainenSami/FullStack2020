@@ -4,12 +4,16 @@ import axios from 'axios';
 import {Entry, EntryWithoutId, Patient, Gender} from '../types';
 import { useParams } from 'react-router-dom';
 import EntryComponent from '../components/EntryComponent';
-import AddEntryModal from '../AddEntryModal/index';
+import AddHealthCheckModal from '../AddHealthCheckModal/index';
+import AddHospitalCheckModal from '../AddHospitalModal/index';
+import AddOccupationalHealthcareModal from '../AddEntryModal/index';
 import { useStateValue } from '../state';
 import { createEntry } from '../state/reducer';
 
 const PatientPage = (): JSX.Element => {
-  const [modalOpen, setModal] = useState<boolean>(false);
+  const [modalOccupationalHealthcareOpen, setOccupationalhealthcareModal] = useState<boolean>(false);
+  const [modalHospitalOpen, setHospitalModal] = useState<boolean>(false);
+  const [modalHealthCheckOpen, setHealthCheckModal] = useState<boolean>(false);
   const [{patients}, dispatch] = useStateValue();
   const [patient,setPatient] = useState<Patient>( {
       id: 'undefined',
@@ -41,15 +45,21 @@ const PatientPage = (): JSX.Element => {
   };
   const onSubmit = async (values: EntryWithoutId): Promise<void> => {
     try{
-      closeModal(); 
+      closeOccupationalHealthcareModal(); 
+      closeHospitalModal();
+      closeHealthCheckModal();
       const entry = await axios.post<Entry>(`${apiBaseUrl}/patients/${id}/entries`, values);
       dispatch(createEntry(entry.data, patient, id));
     } catch (e) {
       console.log(e);
     }
   };
-  const openModal = (): void => setModal(true);
-  const closeModal = (): void => setModal(false);
+  const openOccupationalHealthcareModal = (): void => setOccupationalhealthcareModal(true);
+  const closeOccupationalHealthcareModal = (): void => setOccupationalhealthcareModal(false);
+  const openHospitalModal = (): void => setHospitalModal(true);
+  const closeHospitalModal = (): void => setHospitalModal(false);
+  const openHealthCheckModal = (): void => setHealthCheckModal(true);
+  const closeHealthCheckModal = (): void => setHealthCheckModal(false);
   if(!patient){
     return <p> asd </p>;
   }
@@ -71,8 +81,12 @@ const PatientPage = (): JSX.Element => {
       <div className='ui cards'> 
         {patient.entries.map(a => <EntryComponent key={a.id} {...a} />)}
       </div>
-      <button onClick={() => openModal()}>Add Entry </button>
-    <AddEntryModal modalOpen={modalOpen} onClose={closeModal} onSubmit={onSubmit} />
+      <button onClick={() => openOccupationalHealthcareModal()}>Add OccupationalHealtcare </button>
+      <button onClick={() => openHospitalModal()}>Add Hospital </button>
+      <button onClick={() => openHealthCheckModal()}>Add HealthCheck </button>
+    <AddOccupationalHealthcareModal modalOpen={modalOccupationalHealthcareOpen} onClose={closeOccupationalHealthcareModal} onSubmit={onSubmit} />
+    <AddHospitalCheckModal modalOpen={modalHospitalOpen} onClose={closeHospitalModal} onSubmit={onSubmit} />
+    <AddHealthCheckModal modalOpen={modalHealthCheckOpen} onClose={closeHealthCheckModal} onSubmit={onSubmit} />
     </div>
 
   );

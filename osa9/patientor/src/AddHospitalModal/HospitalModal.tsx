@@ -1,55 +1,36 @@
 import React from 'react';
 import { Formik, Field  } from 'formik';
-import { EntryWithoutId } from '../types';
+import { HospitalWithoutId } from '../types';
 import { Grid, Button } from 'semantic-ui-react';
-import {NumberField, TextField} from '../AddPatientModal/FormField';
-import { TypeOption, SelectField } from './FormField';
+import { TextField, DiagnosisSelection} from '../AddPatientModal/FormField';
+import { useStateValue } from '../state';
 
-const typeOptions: TypeOption[] = [
-  { value: 'OccupationalHealthcare', label: 'OccupationalHealthcare'},
-  {value: 'Hospital', label: 'Hospital'}, {value: 'HealthCheck', label: 'HealthCheck'}
-];
 interface Props {
-  onSubmit: (values: EntryWithoutId) => void,
+  onSubmit: (values: HospitalWithoutId) => void,
   onCancel: () => void,
 }
-const HealthCheck = () => (
-  <Field
-    label="healthCheckRating"
-    name="healthCheckRating"
-    component={NumberField}
-    min={0}
-    max={3}
-    />
-);
-const EntryForm = ({onSubmit, onCancel}: Props) => {
-  const [value, setValue] = React.useState(typeOptions[0].value);
-  const onChange = (value:TypeOption['value']) => {
-    setValue(value);
-  };
+const HospitalForm = ({onSubmit, onCancel}: Props) => {
+  const [{diagnoses}, ] = useStateValue();
   return(
     <Formik
       initialValues ={{
-        type:'HealthCheck',
+        type:'Hospital',
         date:'',
         specialist:'',
         description: '',
-        healthCheckRating:5 ,
+        diagnosisCodes:[],
+        discharge: {
+          date:'',
+          criteria:''
+        },
       }}
       onSubmit={onSubmit}
     validate = {values => {
       const requiredError='Field is required';
-      const errors: { [field:string]:string} = {};
-      switch(values.type){
-        case 'OccupationalHealthcare':
-          break;
-        case 'HealthCheck':
-          if( !values.healthCheckRating|| values.healthCheckRating<0|| values.healthCheckRating>3){
-            errors.healthCheckRating = requiredError;
-          }
-          break;
-        case 'Hospital':
-          break;
+      const errors: { [field:string]:string|Record<string, unknown>} = {};
+      const dischargeErrors = {date:'', criteria:''};
+      if(!values.diagnosisCodes || values.diagnosisCodes.length === 0){
+        errors.diagnosisCodes = requiredError; 
       }
       if(!values.date || values.date.length === 0 || !/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(values.date)){
         errors.date = requiredError;
@@ -59,23 +40,29 @@ const EntryForm = ({onSubmit, onCancel}: Props) => {
       }
       if(!values.description || values.description.length === 0){
         errors.description = requiredError;
+      } 
+      if(!values.discharge?.date){
+        errors.discharge = requiredError;
+      }else if(!/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(values.discharge?.date)){
+        dischargeErrors.date= 'must be in YYYY/MM/DD form';
+        errors.discharge = dischargeErrors;
       }
+      if(!values.discharge?.criteria){
+        dischargeErrors.criteria = requiredError;
+        errors.discharge = dischargeErrors;
+      }
+      console.log(errors);
       return errors;
     }}
       >
-    {({ dirty, isValid, handleSubmit }) => (
+    {({ dirty, isValid, handleSubmit,  setFieldValue, setFieldTouched }) => (
       <form onSubmit={handleSubmit}>
-        <SelectField
-          label="type"
-          options={typeOptions}
-          name="type"
-          onChange={onChange}
-        />
+        <h1> Hospital </h1>
         <Field
           label="date"
           name="date"
           component={TextField}
-          placeholder='YYYY-MM-DD'
+          placeholder='YYYY/MM/DD'
         />
         <Field
           label="specialist"
@@ -89,7 +76,23 @@ const EntryForm = ({onSubmit, onCancel}: Props) => {
           component={TextField}
           placeholder='description'
         />
-        { value ==='HealthCheck' && <HealthCheck />}
+        <DiagnosisSelection 
+          setFieldValue={setFieldValue}
+          setFieldTouched={setFieldTouched}
+          diagnoses={diagnoses}
+        />
+        <Field
+          label="date"
+          name="discharge.date"
+          component={TextField}
+          placeholder='YYYY/MM/DD'
+        />
+        <Field
+          label="criteria"
+          name="discharge.criteria"
+          component={TextField}
+          placeholder='criteria'
+        />
         <Grid>
           <Grid.Column floated="left" width={5}>
             <Button type="button" onClick={onCancel} color="red">
@@ -113,4 +116,4 @@ const EntryForm = ({onSubmit, onCancel}: Props) => {
   );
 };
 
-export default EntryForm;
+export default HospitalForm;

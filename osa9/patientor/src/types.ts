@@ -12,6 +12,9 @@ export enum Gender {
 export type Entry = OccupationalHealthcare | Hospital | HealthCheck;
 type UnionOmit<T, K extends string | number | symbol> = T extends unknown ? Omit<T, K> : never;
 export type EntryWithoutId = UnionOmit<Entry, 'id'>;
+export type OccupationalHealthcareWithoutId = UnionOmit<OccupationalHealthcare, 'id'>;
+export type HospitalWithoutId = UnionOmit<Hospital, 'id'>;
+export type HealthCheckWithoutId = UnionOmit<HealthCheck, 'id'>;
 interface baseEntry {
   id: string,
   date: string,
@@ -33,18 +36,17 @@ interface Discharge {
   criteria: string,
 }
 export type DiagnosisCodes = Array<Diagnosis['code']>;
-
-interface OccupationalHealthcare extends baseEntry {
+export interface OccupationalHealthcare extends baseEntry {
   type: 'OccupationalHealthcare',
   diagnosisCodes?: DiagnosisCodes,
   employerName: string,
   sickLeave?: SickLeave,
 }
-interface HealthCheck extends baseEntry {
+export interface HealthCheck extends baseEntry {
   type: 'HealthCheck',
   healthCheckRating: HealthCheckRating,
 }
-interface Hospital extends baseEntry {
+export interface Hospital extends baseEntry {
   type: 'Hospital',
   diagnosisCodes: DiagnosisCodes,
   discharge: Discharge,
