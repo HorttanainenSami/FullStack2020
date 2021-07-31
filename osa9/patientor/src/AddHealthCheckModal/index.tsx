@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from 'semantic-ui-react';
-import OccupationalHealtCareForm from './OccupationalHealthcareModal';
+import HealthCheckForm from './HealthCheckForm';
 import { EntryWithoutId } from '../types';
 
 interface Props {
@@ -9,16 +9,16 @@ interface Props {
   onSubmit: (entry: EntryWithoutId) => void;
 }
 
-const AddEntryModal = ({modalOpen, onClose, onSubmit}: Props) => (
+const AddOccupationalHealthcareModal = ({modalOpen, onClose, onSubmit}: Props) => (
   <Modal 
     open={modalOpen}
     onClose={onClose}
     onSubmit={onSubmit}
   >
     <Modal.Content>
-      <OccupationalHealtCareForm onSubmit={onSubmit} onCancel={onClose} /> 
+      <HealthCheckForm onSubmit={onSubmit} onCancel={onClose} /> 
     </Modal.Content>
   </Modal>
 );
 
-export default AddEntryModal;
+export default AddOccupationalHealthcareModal;
